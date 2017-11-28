@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Locate the user</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<style>
+    ul {
+        background-color: #3386c0;
+        padding-left: 1em;
+    }
+
+    ul li {
+        list-style: none;
+    }
+
+    ul li::before {
+        content: "\2022";
+        font-size: 3em;
+        padding-right: 0.25em;
+        vertical-align: top;
+    }
+
+    ul li:nth-of-type(1)::before {
+        color: black;
+    }
+
+    ul li:nth-of-type(2)::before {
+        color: orange;
+    }
+
+    ul li:nth-of-type(3)::before {
+        color: red;
+    }
+
+    .filter-group {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        font-weight: 600;
+        position: absolute;
+        top: 10px;
+        right: 50px;
+        z-index: 1;
+        border-radius: 3px;
+        width: 130px;
+        color: #fff;
+    }
+
+    .filter-group input[type=checkbox]:first-child+label {
+        border-radius: 3px 3px 0 0;
+    }
+
+    .filter-group label:last-child {
+        border-radius: 0 0 3px 3px;
+        border: none;
+    }
+
+    .filter-group input[type=checkbox] {
+        display: none;
+    }
+
+    .filter-group input[type=checkbox]+label {
+        background-color: #3386c0;
+        display: block;
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .filter-group input[type=checkbox]+label {
+        background-color: #3386c0;
+        text-transform: capitalize;
+    }
+
+    .filter-group input[type=checkbox]+label:hover,
+    .filter-group input[type=checkbox]:checked+label {
+        background-color: #4ea0da;
+    }
+
+    .filter-group input[type=checkbox]+label:before {
+        content: '✘';
+        margin-right: 5px;
+    }
+
+    .filter-group input[type=checkbox]:checked+label:before {
+        content: '✔';
+        margin-right: 5px;
+    }
+</style>
+
+<div id='map'></div>
+
+<nav id='filter-group' class='filter-group'>
+    <ul>
+        <li>No EX-raid yet</li>
+        <li>1 EX-raid</li>
+        <li>> 1 EX-raid</li>
+    </ul>
+</nav>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoieGlhbmthaSIsImEiOiJjaXR3Znc0bDYwMDdhMm9uNGlibjh1dGdiIn0.ePiXehbsMRgQrQQAzb-_FQ';
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/xiankai/cjahyn2tf9fuc2tmzsgn4slq9',
+        center: [103.833, 1.358], // starting position
+        zoom: 10.9 // starting zoom
+    });
+
+    // Add geolocate control to the map.
+    map.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true
+    }));
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    map.on('style.load', afterLoad);
+
+    function afterLoad() {
+        var layerID = 'gyms';
+
+        var filterGroup = document.getElementById('filter-group');
+
+        // Add checkbox and label elements for the layer.
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = layerID;
+        input.checked = false;
+        filterGroup.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', layerID);
+        label.textContent = 'Show all gyms';
+        filterGroup.appendChild(label);
+
+        // When the checkbox changes, update the visibility of the layer.
+        input.addEventListener('change', function (e) {
+            map.setFilter(layerID, e.target.checked ? ['all'] : ['has', 'in_park']);
+            map.setFilter(layerID + ' labels', e.target.checked ? ['all'] : ['has', 'in_park']);
+
+        });
+    }
+</script>
+
+</body>
+</html>
