@@ -4,6 +4,13 @@
     <meta charset='utf-8' />
     <title>Potential EX-raid locations in Singapore</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://cdn.ravenjs.com/3.20.1/raven.min.js" crossorigin="anonymous"></script>
+    <script>
+        Raven.config('https://aba13d4b00f2498d8ae696d22a2e0c36@sentry.io/252833', {
+            release: '30 Nov'
+        }).install()
+
+    </script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89688850-3"></script>
     <script>
@@ -117,6 +124,7 @@
 </nav>
 
 <script>
+Raven.context(function () {
     mapboxgl.accessToken = 'pk.eyJ1IjoieGlhbmthaSIsImEiOiJjaXR3Znc0bDYwMDdhMm9uNGlibjh1dGdiIn0.ePiXehbsMRgQrQQAzb-_FQ';
     var map = new mapboxgl.Map({
         container: 'map', // container id
@@ -162,6 +170,7 @@
 
         });
     }
+});
 </script>
 
 </body>
