@@ -160,33 +160,33 @@
         map.on('load', afterLoad);
 
         function afterLoad() {
-            var layerID = 'gyms';
+            var gymsID = 'gyms';
 
             var filterGroup = document.getElementById('filter-group');
 
             // Add checkbox and label elements for the layer.
             var input = document.createElement('input');
             input.type = 'checkbox';
-            input.id = layerID;
+            input.id = gymsID;
             input.checked = false;
             filterGroup.appendChild(input);
 
             var label = document.createElement('label');
-            label.setAttribute('for', layerID);
+            label.setAttribute('for', gymsID);
             label.textContent = 'Show all gyms';
             filterGroup.appendChild(label);
 
             // When the checkbox changes, update the visibility of the layer.
             input.addEventListener('change', function (e) {
-                map.setFilter(layerID, e.target.checked ? ['all'] : ['has', 'in_park']);
-                map.setFilter(layerID + ' labels', e.target.checked ? ['all'] : ['has', 'in_park']);
+                map.setFilter(gymsID, e.target.checked ? null : ['has', 'in_park']);
+                map.setFilter(gymsID + ' labels', e.target.checked ? null : ['has', 'in_park']);
             });
 
-            layerID = 'combine';
+            raidsID = 'combine';
 
             // Add checkbox and label elements for the layer.
             var select = document.createElement('select');
-            select.id = layerID;
+            select.id = raidsID;
 
             // Add default option
             var all = document.createElement('option');
@@ -222,9 +222,10 @@
 
             // When the dropdown changes, update the filters
             select.addEventListener('change', function (e) {
-                var filter = ['has', e.target.value];
-                map.setFilter(layerID, filter);
-                map.setFilter(layerID + ' labels', filter);
+                var date = e.target.value;
+                var filter = date ? ['has', date] : null;
+                map.setFilter(raidsID, filter);
+                map.setFilter(raidsID + ' labels', filter);
             });
         }
 // });
