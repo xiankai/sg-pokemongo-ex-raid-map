@@ -165,24 +165,40 @@
             var filterGroup = document.getElementById('filter-group');
 
             // Add checkbox and label elements for the layer.
-            var input = document.createElement('input');
-            input.type = 'checkbox';
-            input.id = gymsID;
-            input.checked = false;
-            filterGroup.appendChild(input);
+            var gyms_select = document.createElement('select');
+            gyms_select.id = gymsID;
 
-            var label = document.createElement('label');
-            label.setAttribute('for', gymsID);
-            label.textContent = 'Show all gyms';
-            filterGroup.appendChild(label);
+            // Add options
+            [['in_park', 'In Park'], ['all', 'All Gyms'], ['only_raids', 'Only EX-raids']].forEach(function(option) {
+                var value = option[0];
+                var label = option[1];
 
-            // When the checkbox changes, update the visibility of the layer.
-            input.addEventListener('change', function (e) {
-                map.setFilter(gymsID, e.target.checked ? null : ['has', 'in_park']);
-                map.setFilter(gymsID + ' labels', e.target.checked ? null : ['has', 'in_park']);
+                var gyms_option = document.createElement('option');
+                gyms_option.value = value;
+                gyms_option.innerHTML = label;
+                gyms_select.appendChild(gyms_option);
             });
 
-            raidsID = 'combine';
+            filterGroup.appendChild(gyms_select);
+
+            // When the dropdown changes, update the filters
+            gyms_select.addEventListener('change', function (e) {
+                switch (e.target.value) {
+                    case 'in_park':
+                        filter = ['has', 'in_park'];
+                        break;
+                    case 'all':
+                        filter = null;
+                        break;
+                    case 'only_raids':
+                        filter = ['has', 'pika'];
+                        break;
+                }
+                map.setFilter(gymsID, filter);
+                map.setFilter(gymsID + ' labels', filter);
+            });
+
+            var raidsID = 'combine';
 
             // Add checkbox and label elements for the layer.
             var select = document.createElement('select');
@@ -211,7 +227,7 @@
             // }
 
             // Hardcoded manual sort for now
-            ['11 Nov', '18 Nov', '26 Nov', '3 Dec', '11 Dec'].forEach(date => {
+            ['11 Nov', '18 Nov', '26 Nov', '3 Dec', '11 Dec'].forEach(function(date) {
                 var option = document.createElement('option');
                 option.value = date;
                 option.innerHTML = date;
