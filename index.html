@@ -158,7 +158,7 @@
         // Add zoom and rotation controls to the map.
         map.addControl(new mapboxgl.NavigationControl());
 
-        map.on('source.load', afterLoad);
+        map.on('load', afterLoad);
 
         function afterLoad() {
             var layerID = 'gyms';
