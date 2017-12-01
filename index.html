@@ -199,10 +199,21 @@
 
             filterGroup.appendChild(select);
 
-            // When the checkbox changes, update the visibility of the layer.
-            input.addEventListener('change', function (e) {
-                map.setFilter(layerID, e.target.checked ? ['all'] : ['has', 'in_park']);
-                map.setFilter(layerID + ' labels', e.target.checked ? ['all'] : ['has', 'in_park']);
+            // When the dropdown changes, update the filters
+            select.addEventListener('change', function (e) {
+                var field = e.target.value;
+                switch(field) {
+                    case 'in_park': 
+                        filter = ['has', 'in_park'];
+                        break;
+                    case 'all_gyms':
+                        filter = null;
+                        break;
+                    default: 
+                        filter = ['has', field];
+                }
+                map.setFilter(layerID, filter);
+                map.setFilter(layerID + ' labels', filter);
             });
         }
 // });
