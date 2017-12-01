@@ -39,7 +39,6 @@
 </head>
 
 <body>
-
     <style>
         ul {
             background-color: #3386c0;
@@ -166,52 +165,64 @@
             var filterGroup = document.getElementById('filter-group');
 
             // Add checkbox and label elements for the layer.
+            var input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = layerID;
+            input.checked = false;
+            filterGroup.appendChild(input);
+
+            var label = document.createElement('label');
+            label.setAttribute('for', layerID);
+            label.textContent = 'Show all gyms';
+            filterGroup.appendChild(label);
+
+            // When the checkbox changes, update the visibility of the layer.
+            input.addEventListener('change', function (e) {
+                map.setFilter(layerID, e.target.checked ? ['all'] : ['has', 'in_park']);
+                map.setFilter(layerID + ' labels', e.target.checked ? ['all'] : ['has', 'in_park']);
+            });
+
+            layerID = 'combine';
+
+            // Add checkbox and label elements for the layer.
             var select = document.createElement('select');
             select.id = layerID;
-            select.value = 'in_park';
 
-            // Add base options
-            var inPark = document.createElement('option');
-            inPark.value = 'in_park';
-            inPark.innerHTML = 'In Park';
-            select.appendChild(inPark);
-
-            var allGyms = document.createElement('option');
-            allGyms.value = 'all_gyms';
-            allGyms.innerHTML = 'All Gyms';
-            select.appendChild(allGyms);
+            // Add default option
+            var all = document.createElement('option');
+            all.value = '';
+            all.innerHTML = 'All raid times';
+            select.appendChild(all);
 
             // Get the dates
-            var fields = map.getSource('composite')
-                .vectorLayers
-                .find(layer => layer.id === 'Combined')
-                .fields;
+            // var fields = map.getSource('composite')
+            //     .vectorLayers
+            //     .find(layer => layer.id === 'Combined')
+            //     .fields;
 
             // Convert dates to select options
-            for (field in fields) {
-                if (['name', 'count'].indexOf(field) < 0) {
-                    var option = document.createElement('option');
-                    option.value = field;
-                    option.innerHTML = field;
-                    select.appendChild(option);
-                }
-            }
+            // for (field in fields) {
+            //     if (['name', 'count'].indexOf(field) < 0) {
+            // var option = document.createElement('option');
+            // option.value = field;
+            // option.innerHTML = field;
+            // select.appendChild(option);
+            //     }
+            // }
+
+            // Hardcoded manual sort for now
+            ['11 Nov', '18 Nov', '26 Nov', '3 Dec', '11 Dec'].forEach(date => {
+                var option = document.createElement('option');
+                option.value = date;
+                option.innerHTML = date;
+                select.appendChild(option);
+            });
 
             filterGroup.appendChild(select);
 
             // When the dropdown changes, update the filters
             select.addEventListener('change', function (e) {
-                var field = e.target.value;
-                switch(field) {
-                    case 'in_park': 
-                        filter = ['has', 'in_park'];
-                        break;
-                    case 'all_gyms':
-                        filter = null;
-                        break;
-                    default: 
-                        filter = ['has', field];
-                }
+                var filter = ['has', e.target.value];
                 map.setFilter(layerID, filter);
                 map.setFilter(layerID + ' labels', filter);
             });
