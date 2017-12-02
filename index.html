@@ -248,6 +248,28 @@
                 map.setFilter(raidsID, filter);
                 map.setFilter(raidsID + ' labels', filter);
             });
+
+            function renderPopup(e) {
+                var feature = e.features[0];
+                console.log(feature);
+                var lngLat = feature.geometry.coordinates;
+                new mapboxgl.Popup()
+                    .setLngLat(lngLat)
+                    .setHTML(
+                    '<strong>' + feature.properties.name + '</strong>'+
+                    '<div>'+
+                        '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + ',' + lngLat[0] + '">'+
+                            'Google Maps'+
+                        '</a>'+
+                    '</div>'
+                    )
+                    .addTo(map);
+            }
+
+            map.on('click', raidsID, renderPopup);
+            map.on('click', raidsID + ' labels', renderPopup);
+            map.on('click', gymsID, renderPopup);
+            map.on('click', gymsID + ' labels', renderPopup);
         }
     });
     </script>
