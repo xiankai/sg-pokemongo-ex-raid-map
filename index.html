@@ -45,30 +45,30 @@
             margin: 5%;
         }
 
-        ul {
+        .filter-group ul {
             padding-left: 1em;
         }
 
-        ul li {
+        .filter-group ul li {
             list-style: none;
         }
 
-        ul li::before {
+        .filter-group ul li::before {
             content: "\2022";
             font-size: 3em;
             padding-right: 0.25em;
             vertical-align: top;
         }
 
-        ul li:nth-of-type(1)::before {
+        .filter-group ul li:nth-of-type(1)::before {
             color: black;
         }
 
-        ul li:nth-of-type(2)::before {
+        .filter-group ul li:nth-of-type(2)::before {
             color: orange;
         }
 
-        ul li:nth-of-type(3)::before {
+        .filter-group ul li:nth-of-type(3)::before {
             color: red;
         }
 
@@ -232,7 +232,8 @@
             // }
 
             // Hardcoded manual sort for now
-            ['11 Nov', '18 Nov', '26 Nov', '3 Dec', '11 Dec'].forEach(function(date) {
+            var dates = ['11 Nov', '18 Nov', '26 Nov', '3 Dec', '11 Dec']
+            dates.forEach(function(date) {
                 var option = document.createElement('option');
                 option.value = date;
                 option.innerHTML = date;
@@ -251,13 +252,27 @@
 
             function renderPopup(e) {
                 var feature = e.features[0];
-                console.log(feature);
+                var count = feature.properties.count;
                 var lngLat = feature.geometry.coordinates;
+
+                var exraidHTML = '';
+                if (count) {
+                    exraidHTML += '<div>EX-raids:<ul>';
+                    dates.forEach(function(date) {
+                        if (feature.properties[date]) {
+                            exraidHTML += '<li>'+date+'</li>';
+                        }
+                    });
+                } else {
+                    exraidHTML += '<div>No EX-raid yet</div>';
+                }
+
                 new mapboxgl.Popup()
                     .setLngLat(lngLat)
                     .setHTML(
                     '<strong>' + feature.properties.name + '</strong>'+
                     '<div>'+
+                        exraidHTML+
                         '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + ',' + lngLat[0] + '">'+
                             'Google Maps'+
                         '</a>'+
