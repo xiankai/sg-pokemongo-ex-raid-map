@@ -281,9 +281,7 @@
                     .addTo(map);
             }
 
-            map.on('click', raidsID, renderPopup);
             map.on('click', raidsID + ' labels', renderPopup);
-            map.on('click', gymsID, renderPopup);
             map.on('click', gymsID + ' labels', renderPopup);
         }
     });
