@@ -190,7 +190,7 @@
 
         var map = L.map('map').setView([1.358, 103.833], 12);
 
-        fetchLocal('./all.geojson')
+        fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3c7e9af509732ffe832f5ea0ed5e322f98726b19/all.geojson')
             .then(data => {
                 var markers = L.markerClusterGroup();
                 markers.addLayer(
