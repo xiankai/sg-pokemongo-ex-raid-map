@@ -22,7 +22,10 @@
         gtag('config', 'UA-89688850-3');
     </script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.2.0/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.2.0/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.2.0/dist/leaflet.markercluster.js"></script>
     <style>
         body {
             margin: 0;
@@ -30,6 +33,7 @@
         }
 
         #map {
+            z-index: 0;
             position: absolute;
             top: 0;
             bottom: 0;
@@ -143,7 +147,59 @@
         Oops! This map will not work without javascript, so you need to enable it. It won't hurt, I swear on mewtwo's fingers.
     </noscript>
     <script>
+        function fetchLocal(url) {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest
+                xhr.onload = function () {
+                    resolve(JSON.parse(xhr.responseText))
+                }
+                xhr.onerror = function () {
+                    reject(new TypeError('Local request failed'))
+                }
+                xhr.open('GET', url)
+                xhr.send(null)
+            })
+        }
+
+        function renderPopup(layer) {
+            console.log(layer);
+            var feature = layer.feature;
+            var count = feature.properties.count;
+            var lngLat = feature.geometry.coordinates;
+
+            var exraidHTML = '';
+            if (count) {
+                exraidHTML += '<div>EX-raids:<ul>';
+                feature.properties.dates.forEach(function (date) {
+                    exraidHTML += '<li>' + date + '</li>';
+                });
+            } else {
+                exraidHTML += '<div>No EX-raid yet</div>';
+            }
+
+            return (
+                '<strong>' + feature.properties.name + '</strong>' +
+                '<div>' +
+                exraidHTML +
+                '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + ',' + lngLat[0] + '">' +
+                'Google Maps' +
+                '</a>' +
+                '</div>'
+            );
+        }
+
         var map = L.map('map').setView([1.358, 103.833], 12);
+
+        fetchLocal('./all.geojson')
+            .then(data => {
+                var markers = L.markerClusterGroup();
+                markers.addLayer(
+                    L.geoJSON(data)
+                ).bindPopup(renderPopup);
+                map.addLayer(markers);
+            })
+
+
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
