@@ -77,7 +77,7 @@
                 <input type="radio" name="gyms" id="parks" value="parks"> In Park Only
             </label>
             <label class="btn btn-secondary active" for="raids">
-                <input type="radio" name="gyms" id="raids" value="raids" checked> With EX Raids Only
+                <input type="radio" name="gyms" id="raids" value="raids"> With EX Raids Only
             </label>
         </div>
         <div class="btn-group" id="secondary-group" data-toggle="buttons">
@@ -132,11 +132,16 @@
             );
         }
 
-        var markers = L.markerClusterGroup();
+        var markers = L.markerClusterGroup({
+            maxClusterRadius: () => {
+                return currentFilter === 'raids' ? 0 : 80;
+            }
+        });
         var map = L.map('map').setView([1.358, 103.833], 12);
         var gyms;
         var terrains;
         var dates;
+        var currentFilter = 'raids';
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '<a href="https://github.com/xiankai/sg-pokemongo-ex-raid-map/issues/new">Leave comments here</a> | &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -173,6 +178,7 @@
             });
 
         $('#primary-group').on('change', 'input[type="radio"]', function(e) {
+            currentFilter = e.target.value;
             $('#secondary-group').empty();
             var defaultButton;
             switch (e.target.value) {
