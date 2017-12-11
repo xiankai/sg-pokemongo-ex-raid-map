@@ -274,9 +274,12 @@
                     '<strong>' + feature.properties.name + '</strong>'+
                     '<div>'+
                         exraidHTML+
-                        '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + ',' + lngLat[0] + '">'+
+                        '<div><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + ',' + lngLat[0] + '">'+
                             'Google Maps'+
-                        '</a>'+
+                        '</a></div>'+
+                        '<div><a target="_blank" href="https://sgpokemap.com/gym.html#' + lngLat[1] + ',' + lngLat[0] + '">'+
+                            'SGPokemap'+
+                        '</a></div>'+
                     '</div>'
                     )
                     .addTo(map);
