@@ -8,7 +8,7 @@
     <script src="https://cdn.ravenjs.com/3.20.1/raven.min.js" crossorigin="anonymous"></script>
     <script>
         Raven.config('https://aba13d4b00f2498d8ae696d22a2e0c36@sentry.io/252833', {
-            release: '7 Dec'
+            release: '12 Dec'
         }).install()
 
     </script>
@@ -24,8 +24,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.2.0/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.2.0/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.62.0/dist/L.Control.Locate.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"    />
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.2.0/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.62.0/src/L.Control.Locate.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -38,110 +46,42 @@
             top: 0;
             bottom: 0;
             width: 100%;
-            height: 100%;
+            margin-top: 35px;
+        }
+
+        .leaflet-control.leaflet-control-zoom {
+            margin-top: 55px;
+        }
+
+        #primary-group, #secondary-group {
+            z-index: 1;
+        }
+
+        #secondary-group {
+            overflow: auto;
+            width: 100%;
         }
     </style>
 </head>
 
 <body>
-    <style>
-        select {
-            width: 90%;
-            margin: 5%;
-        }
-
-        .filter-group ul {
-            padding-left: 1em;
-        }
-
-        .filter-group ul li {
-            list-style: none;
-        }
-
-        .filter-group ul li::before {
-            content: "\2022";
-            font-size: 3em;
-            padding-right: 0.25em;
-            vertical-align: top;
-        }
-
-        .filter-group ul li:nth-of-type(1)::before {
-            color: black;
-        }
-
-        .filter-group ul li:nth-of-type(2)::before {
-            color: orange;
-        }
-
-        .filter-group ul li:nth-of-type(3)::before {
-            color: red;
-        }
-
-        .filter-group {
-            background-color: #3386c0;
-            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            font-weight: 600;
-            position: absolute;
-            top: 10px;
-            right: 50px;
-            z-index: 1;
-            border-radius: 3px;
-            width: 130px;
-            color: #fff;
-        }
-
-        .filter-group input[type=checkbox]:first-child+label {
-            border-radius: 3px 3px 0 0;
-        }
-
-        .filter-group label:last-child {
-            border-radius: 0 0 3px 3px;
-            border: none;
-        }
-
-        .filter-group input[type=checkbox] {
-            display: none;
-        }
-
-        .filter-group input[type=checkbox]+label {
-            background-color: #3386c0;
-            display: block;
-            cursor: pointer;
-            padding: 10px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        }
-
-        .filter-group input[type=checkbox]+label {
-            background-color: #3386c0;
-            text-transform: capitalize;
-        }
-
-        .filter-group input[type=checkbox]+label:hover,
-        .filter-group input[type=checkbox]:checked+label {
-            background-color: #4ea0da;
-        }
-
-        .filter-group input[type=checkbox]+label:before {
-            content: '✘';
-            margin-right: 5px;
-        }
-
-        .filter-group input[type=checkbox]:checked+label:before {
-            content: '✔';
-            margin-right: 5px;
-        }
-    </style>
+    <div id="topbar">
+        <div class="btn-group" id="primary-group" role="group" data-toggle="buttons">
+            <label class="btn btn-secondary" for="all">
+                <input type="radio" name="gyms" id="all" value="all"> All Gyms
+            </label>
+            <label class="btn btn-secondary" for="parks">
+                <input type="radio" name="gyms" id="parks" value="parks"> In Park Only
+            </label>
+            <label class="btn btn-secondary active" for="raids">
+                <input type="radio" name="gyms" id="raids" value="raids" checked> With EX Raids Only
+            </label>
+        </div>
+        <div class="btn-group" id="secondary-group" data-toggle="buttons">
+        </div>
+    </div>
 
     <div id='map'></div>
-
-    <nav id='filter-group' class='filter-group'>
-        <ul>
-            Legend
-            <li>No EX-raid yet</li>
-            <li>1 EX-raid</li>
-            <li>> 1 EX-raid</li>
-        </ul>
-    </nav>
 
     <noscript>
         Oops! This map will not work without javascript, so you need to enable it. It won't hurt, I swear on mewtwo's fingers.
@@ -162,16 +102,15 @@
         }
 
         function renderPopup(layer) {
-            console.log(layer);
             var feature = layer.feature;
-            var count = feature.properties.count;
+            var dates = feature.properties.dates;
             var lngLat = feature.geometry.coordinates;
 
             var exraidHTML = '';
-            if (count) {
+            if (dates && dates.length > 0) {
                 exraidHTML += '<div>EX-raids:<ul>';
-                feature.properties.dates.forEach(function (date) {
-                    exraidHTML += '<li>' + date + '</li>';
+                dates.reverse().forEach(function (date) {
+                    exraidHTML += '<li>' + moment(date).format('D MMM') + '</li>';
                 });
             } else {
                 exraidHTML += '<div>No EX-raid yet</div>';
@@ -188,26 +127,99 @@
             );
         }
 
-        function addToMap(layer) {
-            var markers = L.markerClusterGroup();
-            markers.addLayer(layer).bindPopup(renderPopup);
-            map.addLayer(markers);
-        }
-
+        var markers = L.markerClusterGroup();
         var map = L.map('map').setView([1.358, 103.833], 12);
         var gyms;
+        var terrains;
+        var dates;
 
-        fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3c7e9af509732ffe832f5ea0ed5e322f98726b19/all.geojson')
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '<a href="https://github.com/xiankai/sg-pokemongo-ex-raid-map/issues/new">Leave comments here</a> | &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.control.locate().addTo(map);
+
+        function addToMap(layer) {
+            markers.clearLayers();
+            markers.addLayer(layer).bindPopup(renderPopup);
+            map.addLayer(markers);
+            return markers;
+        }
+
+        fetchLocal('https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/186aa62081d3a76211300ebb5629246c23892e3f/all.geojson')
             .then(data => {
                 gyms = data;
+                
+                terrains = []
+                    .concat(...gyms.features.map(feature => feature.properties.terrains));
+                terrains = terrains.filter((item, pos) => item && terrains.indexOf(item) === pos)
+                    .sort((a, b) => moment(b) - moment(a));
+
+                dates = []
+                    .concat(...gyms.features.map(feature => feature.properties.dates));
+                dates = dates
+                    .filter((item, pos) => item && dates.indexOf(item) === pos)
+                    .sort((a, b) => moment(b) - moment(a));
+
+                // show submenu at start
+                $('#primary-group [value="raids"]').trigger('change');
+
                 addToMap(L.geoJSON(gyms, { filter: feature => feature.properties.dates && feature.properties.dates.length > 0 }));
             });
 
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+        $('#primary-group').on('change', 'input[type="radio"]', function(e) {
+            $('#secondary-group').empty();
+            var defaultButton;
+            switch (e.target.value) {
+                case 'raids':
+                    var key = 'dates';
+                    defaultButton = "all";
+                    addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].length > 0 }));
 
-        
+                    // default
+                    $('#secondary-group').append(`
+                        <label class="btn btn-secondary" for="all">
+                            <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>All
+                        </label>
+                    `);
+
+                    dates.forEach(date => {
+                        $('#secondary-group').append(`
+                            <label class="btn btn-secondary" for="${date}">
+                                <input type="radio" name="${key}" id="${date}" value="${date}">${moment(date).format('D MMM')}
+                            </label>
+                        `);
+                    });
+                    break;
+                case 'all':
+                    addToMap(L.geoJSON(gyms));
+                    break;
+                case 'parks':
+                    var key = 'terrains';
+                    defaultButton = '2016-07-01';
+                    addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1 }));
+
+                    terrains.forEach(terrain => {
+                        $('#secondary-group').append(`
+                            <label class="btn btn-secondary" for="${terrain}">
+                                <input type="radio" name="${key}" id="${terrain}" value="${terrain}"${terrain === defaultButton ? 'checked' : ''}>${moment(terrain).format('MMM YYYY')}
+                            </label>
+                        `);
+                    });
+                    break;
+            }
+            $('#secondary-group input[type="radio"]').button();
+            $(`#secondary-group label[for="${defaultButton}"]`).button('toggle');
+        });
+
+        $('#secondary-group').on('change', 'input[type="radio"]', function (e) {
+            var key = $(this).prop('name');
+            if (e.target.value === 'all') {
+                addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].length > -1 }));
+            } else {
+                addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].indexOf(e.target.value) > -1 }));
+            }
+        });
     </script>
 
 </body>
