@@ -46,11 +46,10 @@
             top: 0;
             bottom: 0;
             width: 100%;
-            margin-top: 35px;
         }
 
         .leaflet-control.leaflet-control-zoom {
-            margin-top: 55px;
+            margin-top: 5.5rem;
         }
 
         #primary-group, #secondary-group {
@@ -60,6 +59,10 @@
         #secondary-group {
             overflow: auto;
             width: 100%;
+        }
+
+        label {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -112,6 +115,7 @@
                 dates.reverse().forEach(function (date) {
                     exraidHTML += '<li>' + moment(date).format('D MMM') + '</li>';
                 });
+                exraidHTML += '</ul></div>';
             } else {
                 exraidHTML += '<div>No EX-raid yet</div>';
             }
