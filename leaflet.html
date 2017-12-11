@@ -188,20 +188,26 @@
             );
         }
 
+        function addToMap(layer) {
+            var markers = L.markerClusterGroup();
+            markers.addLayer(layer).bindPopup(renderPopup);
+            map.addLayer(markers);
+        }
+
         var map = L.map('map').setView([1.358, 103.833], 12);
+        var gyms;
 
         fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3c7e9af509732ffe832f5ea0ed5e322f98726b19/all.geojson')
             .then(data => {
-                var markers = L.markerClusterGroup();
-                markers.addLayer(
-                    L.geoJSON(data)
-                ).bindPopup(renderPopup);
-                map.addLayer(markers);
-            })
+                gyms = data;
+                addToMap(L.geoJSON(gyms, { filter: feature => feature.properties.dates && feature.properties.dates.length > 0 }));
+            });
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
+
+        
     </script>
 
 </body>
