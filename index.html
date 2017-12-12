@@ -215,7 +215,7 @@
                     break;
                 case 'parks':
                     var key = 'terrains';
-                    defaultButton = '2016-07-01';
+                    defaultButton = '2016-08-01';
                     addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1 }));
 
                     // default
