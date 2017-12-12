@@ -212,6 +212,13 @@
                     defaultButton = '2016-07-01';
                     addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1 }));
 
+                    // default
+                    $('#secondary-group').append(`
+                        <label class="btn btn-light" disabled>
+                            Map date
+                        </label>
+                    `);
+
                     terrains.forEach(terrain => {
                         $('#secondary-group').append(`
                             <label class="btn btn-secondary" for="${terrain}">
