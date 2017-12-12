@@ -108,6 +108,7 @@
             var feature = layer.feature;
             var dates = feature.properties.dates;
             var lngLat = feature.geometry.coordinates;
+            lngLat = lngLat.map(x => Math.round(x*1000000)/1000000);
 
             var exraidHTML = '';
             if (dates && dates.length > 0) {
