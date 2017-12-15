@@ -188,7 +188,7 @@ $("#secondary-group").on("change", 'input[type="radio"]', function(e) {
     addToMap(
       L.geoJSON(gyms, {
         filter: feature =>
-          feature.properties[key] && feature.properties[key].length > -1
+          feature.properties[key] && feature.properties[key].length > 0
       })
     );
   } else {

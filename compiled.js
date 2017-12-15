@@ -151,7 +151,7 @@ $("#secondary-group").on("change", 'input[type="radio"]', function (e) {
   if (e.target.value === "all") {
     addToMap(L.geoJSON(gyms, {
       filter: function filter(feature) {
-        return feature.properties[key] && feature.properties[key].length > -1;
+        return feature.properties[key] && feature.properties[key].length > 0;
       }
     }));
   } else {
