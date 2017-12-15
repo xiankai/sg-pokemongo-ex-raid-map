@@ -147,8 +147,8 @@
             minZoom: 10
         });
         var gyms;
-        var terrains;
-        var dates;
+        var terrains = [];
+        var dates = [];
         var currentFilter = 'raids';
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -216,7 +216,14 @@
                 case 'parks':
                     var key = 'terrains';
                     defaultButton = '2016-08-01';
-                    addToMap(L.geoJSON(gyms, { filter: feature => feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1 }));
+                    addToMap(
+                        L.geoJSON(gyms, {
+                            filter: function(feature) {
+                                return feature.properties[key] &&
+                                feature.properties[key].indexOf(defaultButton) > -1
+                            } 
+                        })
+                    );
 
                     // default
                     $('#secondary-group').append(`
