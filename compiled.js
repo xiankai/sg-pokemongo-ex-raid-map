@@ -68,7 +68,7 @@ function addToMap(layer) {
   return markers;
 }
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/1509d16007b0a74f3cec63f5eb5715da5662300c/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/5c577ab887186ee300896c20d314d0a11547e901/all.geojson").then(function (data) {
   var _ref, _ref2;
 
   gyms = data;
