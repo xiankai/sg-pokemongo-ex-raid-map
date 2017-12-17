@@ -55,8 +55,8 @@ var terrains = [];
 var dates = [];
 var currentFilter = "raids";
 
-L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://github.com/xiankai/sg-pokemongo-ex-raid-map/issues/new">Leave comments here</a>'
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://github.com/xiankai/sg-pokemongo-ex-raid-map/issues/new">Leave comments here</a>'
 }).addTo(map);
 
 L.control.locate().addTo(map);
