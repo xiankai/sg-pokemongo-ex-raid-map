@@ -127,13 +127,6 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
         })
       );
 
-      // default
-      $("#secondary-group").append(`
-                        <label class="btn btn-secondary" for="all">
-                            <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>All
-                        </label>
-                    `);
-
       dates.forEach(date => {
         $("#secondary-group").prepend(`
                             <label class="btn btn-secondary" for="${date}">
@@ -143,6 +136,13 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
                             </label>
                         `);
       });
+
+      // default
+      $("#secondary-group").prepend(`
+                        <label class="btn btn-secondary" for="all">
+                            <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>All
+                        </label>
+                    `);
       break;
     case "all":
       addToMap(L.geoJSON(gyms));
