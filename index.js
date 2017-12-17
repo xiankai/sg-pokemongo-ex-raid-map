@@ -84,7 +84,7 @@ function addToMap(layer) {
 }
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/a7882d755ae6fe22117ba75a5694693caad63d0f/all.geojson"
+  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/86db266088b7605d442e18f36505af7bbe614e57/all.geojson"
 ).then(data => {
   gyms = data;
 
