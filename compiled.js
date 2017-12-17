@@ -27,7 +27,7 @@ function renderPopup(layer) {
   var exraidHTML = "";
   if (dates && dates.length > 0) {
     exraidHTML += "<div>EX-raids:<ul>";
-    dates.reverse().forEach(function (date) {
+    dates.forEach(function (date) {
       exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
     });
     exraidHTML += "</ul></div>";
@@ -90,6 +90,7 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   }).sort(function (a, b) {
     return moment(b) - moment(a);
   });
+  dates.reverse();
 
   // show submenu at start
   $('#primary-group [value="raids"]').trigger("change");
