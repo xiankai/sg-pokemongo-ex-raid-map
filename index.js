@@ -135,7 +135,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
                     `);
 
       dates.forEach(date => {
-        $("#secondary-group").append(`
+        $("#secondary-group").prepend(`
                             <label class="btn btn-secondary" for="${date}">
                                 <input type="radio" name="${key}" id="${date}" value="${date}">${moment(
           date
