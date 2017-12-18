@@ -29,27 +29,27 @@ function renderPopup(layer) {
     exraidHTML += "<div>No EX-raid yet</div>";
   }
 
-  return (
-    "<strong>" +
-    feature.properties.name +
-    "</strong>" +
-    exraidHTML +
-    '<div><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' +
-    lngLat[1] +
-    "," +
-    lngLat[0] +
-    '">' +
-    "Google Maps" +
-    "</a></div>" +
-    "<br/>" +
-    '<div><a target="_blank" href="https://sgpokemap.com/gym.html#' +
-    lngLat[1] +
-    "," +
-    lngLat[0] +
-    '">' +
-    "SGPokemap" +
-    "</a></div>"
-  );
+  return `
+    <strong>
+    ${feature.properties.name}
+    </strong>
+    ${exraidHTML}
+    <div>
+      <a target="_blank" href="
+      https://www.google.com/maps/search/?api=1&query=${lngLat[1]},${lngLat[0]}
+      ">
+        Google Maps
+      </a>
+    </div>
+    <br/>
+    <div>
+      <a target="_blank" href="
+      https://sgpokemap.com/gym.html#${lngLat[1]},${lngLat[0]}
+      ">
+        SGPokemap
+      </a>
+    </div>
+    `;
 }
 
 var markers = L.markerClusterGroup({
@@ -129,20 +129,20 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
 
       dates.forEach(date => {
         $("#secondary-group").prepend(`
-                            <label class="btn btn-secondary" for="${date}">
-                                <input type="radio" name="${key}" id="${date}" value="${date}">${moment(
-          date
-        ).format("D MMM")}
-                            </label>
-                        `);
+          <label class="btn btn-secondary" for="${date}">
+            <input type="radio" name="${key}" id="${date}" value="${date}">
+            ${moment(date).format("D MMM")}
+          </label>
+        `);
       });
 
       // default
       $("#secondary-group").prepend(`
-                        <label class="btn btn-secondary" for="all">
-                            <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>All
-                        </label>
-                    `);
+        <label class="btn btn-secondary" for="all">
+          <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>
+          All
+        </label>
+      `);
       break;
     case "all":
       addToMap(L.geoJSON(gyms));
@@ -163,19 +163,19 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
 
       // default
       $("#secondary-group").append(`
-                        <label class="btn btn-light" disabled>
-                            Map date
-                        </label>
-                    `);
+        <label class="btn btn-light" disabled>
+          Map date
+        </label>
+      `);
 
       terrains.forEach(terrain => {
         $("#secondary-group").append(`
-                            <label class="btn btn-secondary" for="${terrain}">
-                                <input type="radio" name="${key}" id="${terrain}" value="${terrain}"${
-          terrain === defaultButton ? "checked" : ""
-        }>${moment(terrain).format("MMM YYYY")}
-                            </label>
-                        `);
+          <label class="btn btn-secondary" for="${terrain}">
+            <input type="radio" name="${key}" id="${terrain}" value="${terrain}"
+              ${terrain === defaultButton ? "checked" : ""}>
+            ${moment(terrain).format("MMM YYYY")}
+          </label>
+        `);
       });
       break;
   }
