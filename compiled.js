@@ -63,7 +63,7 @@ L.control.locate().addTo(map);
 
 function addToMap(layer) {
   markers.clearLayers();
-  markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [30, 100] });
+  markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
   map.addLayer(markers);
   return markers;
 }
