@@ -35,7 +35,7 @@ function renderPopup(layer) {
     exraidHTML += "<div>No EX-raid yet</div>";
   }
 
-  return "<strong>" + feature.properties.name + "</strong>" + exraidHTML + '<div><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + lngLat[1] + "," + lngLat[0] + '">' + "Google Maps" + "</a></div>" + "<br/>" + '<div><a target="_blank" href="https://sgpokemap.com/gym.html#' + lngLat[1] + "," + lngLat[0] + '">' + "SGPokemap" + "</a></div>";
+  return "\n    <strong>\n    " + feature.properties.name + "\n    </strong>\n    " + exraidHTML + "\n    <div>\n      <a target=\"_blank\" href=\"\n      https://www.google.com/maps/search/?api=1&query=" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        Google Maps\n      </a>\n    </div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://sgpokemap.com/gym.html#" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        SGPokemap\n      </a>\n    </div>\n    ";
 }
 
 var markers = L.markerClusterGroup({
@@ -68,7 +68,7 @@ function addToMap(layer) {
   return markers;
 }
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/86db266088b7605d442e18f36505af7bbe614e57/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/37ebbfca515b984bacc70a45e21c38580043426e/all.geojson").then(function (data) {
   var _ref, _ref2;
 
   gyms = data;
@@ -117,11 +117,11 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       }));
 
       dates.forEach(function (date) {
-        $("#secondary-group").prepend("\n                            <label class=\"btn btn-secondary\" for=\"" + date + "\">\n                                <input type=\"radio\" name=\"" + key + "\" id=\"" + date + "\" value=\"" + date + "\">" + moment(date).format("D MMM") + "\n                            </label>\n                        ");
+        $("#secondary-group").prepend("\n          <label class=\"btn btn-secondary\" for=\"" + date + "\">\n            <input type=\"radio\" name=\"" + key + "\" id=\"" + date + "\" value=\"" + date + "\">\n            " + moment(date).format("D MMM") + "\n          </label>\n        ");
       });
 
       // default
-      $("#secondary-group").prepend("\n                        <label class=\"btn btn-secondary\" for=\"all\">\n                            <input type=\"radio\" name=\"" + key + "\" id=\"all\" value=\"" + defaultButton + "\" checked>All\n                        </label>\n                    ");
+      $("#secondary-group").prepend("\n        <label class=\"btn btn-secondary\" for=\"all\">\n          <input type=\"radio\" name=\"" + key + "\" id=\"all\" value=\"" + defaultButton + "\" checked>\n          All\n        </label>\n      ");
       break;
     case "all":
       addToMap(L.geoJSON(gyms));
@@ -136,10 +136,10 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       }));
 
       // default
-      $("#secondary-group").append("\n                        <label class=\"btn btn-light\" disabled>\n                            Map date\n                        </label>\n                    ");
+      $("#secondary-group").append("\n        <label class=\"btn btn-light\" disabled>\n          Map date\n        </label>\n      ");
 
       terrains.forEach(function (terrain) {
-        $("#secondary-group").append("\n                            <label class=\"btn btn-secondary\" for=\"" + terrain + "\">\n                                <input type=\"radio\" name=\"" + key + "\" id=\"" + terrain + "\" value=\"" + terrain + "\"" + (terrain === defaultButton ? "checked" : "") + ">" + moment(terrain).format("MMM YYYY") + "\n                            </label>\n                        ");
+        $("#secondary-group").append("\n          <label class=\"btn btn-secondary\" for=\"" + terrain + "\">\n            <input type=\"radio\" name=\"" + key + "\" id=\"" + terrain + "\" value=\"" + terrain + "\"\n              " + (terrain === defaultButton ? "checked" : "") + ">\n            " + moment(terrain).format("MMM YYYY") + "\n          </label>\n        ");
       });
       break;
   }
