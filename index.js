@@ -112,6 +112,14 @@ fetchLocal(
         feature.properties.dates && feature.properties.dates.length > 0
     })
   );
+
+  fetchLocal(
+    "https://rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
+  ).then(data => {
+    L.geoJSON(data, {})
+      .bindPopup(layer => layer.feature.geometry.properties.order)
+      .addTo(map);
+  });
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function(e) {
