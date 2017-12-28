@@ -56,7 +56,7 @@ var dates = [];
 var currentFilter = "raids";
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://github.com/xiankai/sg-pokemongo-ex-raid-map/issues/new">Leave comments here</a>'
+  attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>'
 }).addTo(map);
 
 L.control.locate().addTo(map);
