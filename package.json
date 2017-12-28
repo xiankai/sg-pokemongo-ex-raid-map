@@ -8,6 +8,6 @@
     "prettier": "^1.9.2"
   },
   "scripts": {
-    "build": "babel index.js -o compiled.js"
+    "build": "babel index.js -o compiled.js --watch"
   }
 }
