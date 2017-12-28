@@ -93,7 +93,7 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   dates.reverse();
 
   // show submenu at start
-  $('#primary-group [value="raids"]').trigger('change');
+  $('#primary-group [value="raids"]').trigger("change");
 
   addToMap(L.geoJSON(gyms, {
     filter: function filter(feature) {
