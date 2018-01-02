@@ -86,7 +86,7 @@ function addToMap(layer) {
 }
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2e65e1f3f2fbd0a3883e86985c3052dfc4023646/all.geojson"
+  "https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/b48a2656ac4ce489e1841dfcca3588830001dc76/all.geojson"
 ).then(data => {
   gyms = data;
 
@@ -97,7 +97,11 @@ fetchLocal(
     .filter((item, pos) => item && terrains.indexOf(item) === pos)
     .sort((a, b) => moment(b) - moment(a));
 
-  dates = [].concat(...gyms.features.map(feature => feature.properties.dates));
+  dates = [].concat(
+    ...gyms.features.map(
+      feature => feature.properties.dates.map(date => date.slice(0, 6).trim()) // only retrieve Day/Month
+    )
+  );
   dates = dates
     .filter((item, pos) => item && dates.indexOf(item) === pos)
     .sort((a, b) => moment(b) - moment(a));
