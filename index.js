@@ -34,6 +34,8 @@ function renderPopup(layer) {
     ${feature.properties.name}
     </strong>
     ${exraidHTML}
+    <div>S2 Cell: ${feature.properties.s2Cell}</div>
+    <br/>
     <div>
       <a target="_blank" href="
       https://www.google.com/maps/search/?api=1&query=${lngLat[1]},${lngLat[0]}
@@ -75,6 +77,16 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 L.control.locate().addTo(map);
+
+L.Control.S2 = L.Control.extend({
+  onAdd: () => {
+    return $(`
+      <div class="leaflet-bar leaflet-control-s2">
+        <a>S2</a>
+      </div>
+    `).get(0);
+  }
+});
 
 function addToMap(layer) {
   markers.clearLayers();
@@ -120,8 +132,11 @@ fetchLocal(
   fetchLocal(
     "https://rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
   ).then(data => {
-    L.geoJSON(data, {})
-      .bindPopup(layer => layer.feature.geometry.properties.order)
+    const s2Layer = L.geoJSON(data, {});
+    L.control
+      .layers(null, {
+        S2: s2Layer
+      })
       .addTo(map);
   });
 });
