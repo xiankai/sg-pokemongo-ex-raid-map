@@ -116,7 +116,7 @@ fetchLocal(
   );
   dates = dates
     .filter((item, pos) => item && dates.indexOf(item) === pos)
-    .sort((a, b) => moment(b) - moment(a));
+    .sort((a, b) => moment(b, "D MMM") - moment(a, "D MMM"));
   dates.reverse();
 
   // show submenu at start
