@@ -22,7 +22,7 @@ function renderPopup(layer) {
   if (dates && dates.length > 0) {
     exraidHTML += "<div>EX-raids:<ul>";
     dates.forEach(function(date) {
-      exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
+      exraidHTML += "<li>" + date.slice(0, 6).trim() + "</li>";
     });
     exraidHTML += "</ul></div>";
   } else {
@@ -86,7 +86,7 @@ function addToMap(layer) {
 }
 
 fetchLocal(
-  "https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/b48a2656ac4ce489e1841dfcca3588830001dc76/all.geojson"
+  "https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/59ae396558af4db93a622ab5d77ee11146ac17d1/all.geojson"
 ).then(data => {
   gyms = data;
 
@@ -209,9 +209,20 @@ $("#secondary-group").on("change", 'input[type="radio"]', function(e) {
   } else {
     addToMap(
       L.geoJSON(gyms, {
-        filter: feature =>
-          feature.properties[key] &&
-          feature.properties[key].indexOf(e.target.value) > -1
+        filter: feature => {
+          if (key === "dates") {
+            return (
+              feature.properties[key]
+                .map(date => date.slice(0, 6).trim())
+                .indexOf(e.target.value) > -1
+            );
+          }
+
+          return (
+            feature.properties[key] &&
+            feature.properties[key].indexOf(e.target.value) > -1
+          );
+        }
       })
     );
   }
