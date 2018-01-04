@@ -68,7 +68,7 @@ function addToMap(layer) {
   return markers;
 }
 
-fetchLocal("https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/b48a2656ac4ce489e1841dfcca3588830001dc76/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2e65e1f3f2fbd0a3883e86985c3052dfc4023646/all.geojson").then(function (data) {
   var _ref, _ref2;
 
   gyms = data;
@@ -83,11 +83,8 @@ fetchLocal("https://rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/b48a
   });
 
   dates = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(gyms.features.map(function (feature) {
-    return feature.properties.dates.map(function (date) {
-      return date.slice(0, 6).trim();
-    });
-  } // only retrieve Day/Month
-  )));
+    return feature.properties.dates;
+  })));
   dates = dates.filter(function (item, pos) {
     return item && dates.indexOf(item) === pos;
   }).sort(function (a, b) {
