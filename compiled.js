@@ -74,7 +74,7 @@ function addToMap(layer) {
   return markers;
 }
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/0c4a64fc0db7012713366cd484a54dc14ec9539f/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3378ac114ea737c9c1acc74c6b2e23b13b5640a3/all.geojson").then(function (data) {
   var _ref, _ref2;
 
   gyms = data;
@@ -110,7 +110,7 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson").then(function (data) {
     var s2Layer = L.geoJSON(data, {});
     L.control.layers(null, {
-      "S2 L10": s2Layer
+      "S2 L12": s2Layer
     }).addTo(map);
   });
 });
