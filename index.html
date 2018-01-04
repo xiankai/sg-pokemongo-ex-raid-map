@@ -8,7 +8,7 @@
     <script src="https://cdn.ravenjs.com/3.20.1/raven.min.js" crossorigin="anonymous"></script>
     <script>
         Raven.config('https://aba13d4b00f2498d8ae696d22a2e0c36@sentry.io/252833', {
-            release: '28 Dec'
+            release: '4 Jan'
         }).install()
 
     </script>
@@ -53,6 +53,10 @@
             margin-top: 6rem;
         }
 
+        .leaflet-control.leaflet-control-s2 > a.active {
+            background-color: grey;
+        }
+
         #primary-group, #secondary-group {
             z-index: 1;
         }
@@ -72,13 +76,13 @@
     <div id="topbar">
         <div class="btn-group" id="primary-group" role="group" data-toggle="buttons">
             <label class="btn btn-secondary" for="all">
-                <input type="radio" name="gyms" id="all" value="all"> All Gyms
+                <input type="radio" name="gyms" id="all" value="all">All Gyms
             </label>
             <label class="btn btn-secondary" for="parks">
-                <input type="radio" name="gyms" id="parks" value="parks"> In Park Only
+                <input type="radio" name="gyms" id="parks" value="parks">In Park Only
             </label>
             <label class="btn btn-secondary active" for="raids">
-                <input type="radio" name="gyms" id="raids" value="raids"> With EX Raids Only
+                <input type="radio" name="gyms" id="raids" value="raids">EX Raids Only
             </label>
         </div>
         <div class="btn-group" id="secondary-group" data-toggle="buttons">

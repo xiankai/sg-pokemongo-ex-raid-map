@@ -35,7 +35,7 @@ function renderPopup(layer) {
     exraidHTML += "<div>No EX-raid yet</div>";
   }
 
-  return "\n    <strong>\n    " + feature.properties.name + "\n    </strong>\n    " + exraidHTML + "\n    <div>\n      <a target=\"_blank\" href=\"\n      https://www.google.com/maps/search/?api=1&query=" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        Google Maps\n      </a>\n    </div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://sgpokemap.com/gym.html#" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        SGPokemap\n      </a>\n    </div>\n    ";
+  return "\n    <strong>\n    " + feature.properties.name + "\n    </strong>\n    " + exraidHTML + "\n    <div>S2 Cell: " + feature.properties.s2Cell + "</div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://www.google.com/maps/search/?api=1&query=" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        Google Maps\n      </a>\n    </div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://sgpokemap.com/gym.html#" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        SGPokemap\n      </a>\n    </div>\n    ";
 }
 
 var markers = L.markerClusterGroup({
@@ -61,6 +61,12 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 L.control.locate().addTo(map);
 
+L.Control.S2 = L.Control.extend({
+  onAdd: function onAdd() {
+    return $("\n      <div class=\"leaflet-bar leaflet-control-s2\">\n        <a>S2</a>\n      </div>\n    ").get(0);
+  }
+});
+
 function addToMap(layer) {
   markers.clearLayers();
   markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
@@ -68,7 +74,7 @@ function addToMap(layer) {
   return markers;
 }
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2e65e1f3f2fbd0a3883e86985c3052dfc4023646/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/0c4a64fc0db7012713366cd484a54dc14ec9539f/all.geojson").then(function (data) {
   var _ref, _ref2;
 
   gyms = data;
@@ -100,6 +106,13 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
       return feature.properties.dates && feature.properties.dates.length > 0;
     }
   }));
+
+  fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson").then(function (data) {
+    var s2Layer = L.geoJSON(data, {});
+    L.control.layers(null, {
+      "S2 L10": s2Layer
+    }).addTo(map);
+  });
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function (e) {

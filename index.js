@@ -34,6 +34,8 @@ function renderPopup(layer) {
     ${feature.properties.name}
     </strong>
     ${exraidHTML}
+    <div>S2 Cell: ${feature.properties.s2Cell}</div>
+    <br/>
     <div>
       <a target="_blank" href="
       https://www.google.com/maps/search/?api=1&query=${lngLat[1]},${lngLat[0]}
@@ -76,6 +78,16 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 L.control.locate().addTo(map);
 
+L.Control.S2 = L.Control.extend({
+  onAdd: () => {
+    return $(`
+      <div class="leaflet-bar leaflet-control-s2">
+        <a>S2</a>
+      </div>
+    `).get(0);
+  }
+});
+
 function addToMap(layer) {
   markers.clearLayers();
   markers
@@ -86,7 +98,7 @@ function addToMap(layer) {
 }
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2e65e1f3f2fbd0a3883e86985c3052dfc4023646/all.geojson"
+  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/0c4a64fc0db7012713366cd484a54dc14ec9539f/all.geojson"
 ).then(data => {
   gyms = data;
 
@@ -112,6 +124,17 @@ fetchLocal(
         feature.properties.dates && feature.properties.dates.length > 0
     })
   );
+
+  fetchLocal(
+    "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
+  ).then(data => {
+    const s2Layer = L.geoJSON(data, {});
+    L.control
+      .layers(null, {
+        "S2 L10": s2Layer
+      })
+      .addTo(map);
+  });
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function(e) {
