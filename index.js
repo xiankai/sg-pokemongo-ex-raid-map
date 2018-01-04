@@ -98,7 +98,7 @@ function addToMap(layer) {
 }
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2e65e1f3f2fbd0a3883e86985c3052dfc4023646/all.geojson"
+  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/0c4a64fc0db7012713366cd484a54dc14ec9539f/all.geojson"
 ).then(data => {
   gyms = data;
 
@@ -126,12 +126,12 @@ fetchLocal(
   );
 
   fetchLocal(
-    "https://rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
+    "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
   ).then(data => {
     const s2Layer = L.geoJSON(data, {});
     L.control
       .layers(null, {
-        S2: s2Layer
+        "S2 L10": s2Layer
       })
       .addTo(map);
   });
