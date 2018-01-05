@@ -101,12 +101,6 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   // show submenu at start
   $('#primary-group [value="raids"]').trigger("change");
 
-  addToMap(L.geoJSON(gyms, {
-    filter: function filter(feature) {
-      return feature.properties.dates && feature.properties.dates.length > 0;
-    }
-  }));
-
   fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson").then(function (data) {
     var s2Layer = L.geoJSON(data, {});
     L.control.layers(null, {
@@ -122,19 +116,14 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
   switch (e.target.value) {
     case "raids":
       var key = "dates";
-      defaultButton = "all";
-      addToMap(L.geoJSON(gyms, {
-        filter: function filter(feature) {
-          return feature.properties[key] && feature.properties[key].length > 0;
-        }
-      }));
+      defaultButton = dates[dates.length - 1];
 
       dates.forEach(function (date) {
         $("#secondary-group").prepend("\n          <label class=\"btn btn-secondary\" for=\"" + date + "\">\n            <input type=\"radio\" name=\"" + key + "\" id=\"" + date + "\" value=\"" + date + "\">\n            " + moment(date).format("D MMM") + "\n          </label>\n        ");
       });
 
       // default
-      $("#secondary-group").prepend("\n        <label class=\"btn btn-secondary\" for=\"all\">\n          <input type=\"radio\" name=\"" + key + "\" id=\"all\" value=\"" + defaultButton + "\" checked>\n          All\n        </label>\n      ");
+      $("#secondary-group").prepend("\n        <label class=\"btn btn-secondary\" for=\"all\">\n          <input type=\"radio\" name=\"" + key + "\" id=\"all\" value=\"all\" checked>\n          All\n        </label>\n      ");
       break;
     case "all":
       addToMap(L.geoJSON(gyms));

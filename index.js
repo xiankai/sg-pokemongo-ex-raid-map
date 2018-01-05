@@ -118,13 +118,6 @@ fetchLocal(
   // show submenu at start
   $('#primary-group [value="raids"]').trigger("change");
 
-  addToMap(
-    L.geoJSON(gyms, {
-      filter: feature =>
-        feature.properties.dates && feature.properties.dates.length > 0
-    })
-  );
-
   fetchLocal(
     "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
   ).then(data => {
@@ -144,13 +137,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
   switch (e.target.value) {
     case "raids":
       var key = "dates";
-      defaultButton = "all";
-      addToMap(
-        L.geoJSON(gyms, {
-          filter: feature =>
-            feature.properties[key] && feature.properties[key].length > 0
-        })
-      );
+      defaultButton = dates[dates.length - 1];
 
       dates.forEach(date => {
         $("#secondary-group").prepend(`
@@ -164,7 +151,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
       // default
       $("#secondary-group").prepend(`
         <label class="btn btn-secondary" for="all">
-          <input type="radio" name="${key}" id="all" value="${defaultButton}" checked>
+          <input type="radio" name="${key}" id="all" value="all" checked>
           All
         </label>
       `);
