@@ -87,8 +87,9 @@ L.Control.S2 = L.Control.extend({
     `).get(0);
   }
 });
+function addToMap(filter = () => true) {
+  const layer = L.geoJSON(gyms, filter);
 
-function addToMap(layer) {
   markers.clearLayers();
   markers
     .addLayer(layer)
@@ -165,21 +166,16 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
       `);
       break;
     case "all":
-      addToMap(L.geoJSON(gyms));
+      addToMap();
       break;
     case "parks":
       key = "terrains";
       defaultButton = "2016-08-01";
       addToMap(
-        L.geoJSON(gyms, {
-          filter: function(feature) {
-            return (
+        feature =>
               feature.properties[key] &&
               feature.properties[key].indexOf(defaultButton) > -1
             );
-          }
-        })
-      );
 
       // default
       $("#secondary-group").append(`
@@ -207,18 +203,13 @@ $("#secondary-group").on("change", 'input[type="radio"]', function(e) {
   const key = $(this).prop("name");
   if (e.target.value === "all") {
     addToMap(
-      L.geoJSON(gyms, {
-        filter: feature =>
-          feature.properties[key] && feature.properties[key].length > 0
-      })
+      feature => feature.properties[key] && feature.properties[key].length > 0
     );
   } else {
     addToMap(
-      L.geoJSON(gyms, {
-        filter: feature =>
+      feature =>
           feature.properties[key] &&
           feature.properties[key].indexOf(e.target.value) > -1
-      })
     );
   }
 });
