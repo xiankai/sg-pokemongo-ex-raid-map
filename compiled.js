@@ -77,10 +77,16 @@ var addToMap = function addToMap() {
   var isS2Toggled = map.hasLayer(s2LayerGroup);
   if (isS2Toggled) {
     onEachFeature = function onEachFeature(feature) {
-      if (s2CellCount[feature.properties.s2Cell]) {
-        s2CellCount[feature.properties.s2Cell]++;
+      var total = feature.properties.dates.length;
+      var s2Cell = s2CellCount[feature.properties.s2Cell];
+
+      if (s2Cell) {
+        s2CellCount[feature.properties.s2Cell] = {
+          count: s2Cell.count + 1,
+          total: s2Cell.total + total
+        };
       } else {
-        s2CellCount[feature.properties.s2Cell] = 1;
+        s2CellCount[feature.properties.s2Cell] = { count: 1, total: total };
       }
     };
   }
@@ -108,11 +114,21 @@ var addToMap = function addToMap() {
 var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   var markers = s2.features.map(function (feature) {
     var s2Cell = feature.properties.order;
-    var count = s2CellCount[s2Cell];
+
+    var _ref = s2CellCount[s2Cell] || {},
+        count = _ref.count,
+        total = _ref.total;
+
+    var html = "";
+    if (count > 1) {
+      html = s2Cell + " (" + count + "x" + total + ")";
+    } else if (count) {
+      html = s2Cell + " (" + total + ")";
+    }
     return L.marker([feature.coordinates[0][3][1], feature.coordinates[0][3][0]], {
       icon: L.divIcon({
         className: "s2-label",
-        html: count ? s2Cell + " (" + count + ")" : ""
+        html: html
       })
     });
   });
@@ -123,11 +139,11 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
 };
 
 fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2c81f0bb91e80cc14b8fe1fb9e14ba6cfd2a4500/all.geojson").then(function (data) {
-  var _ref, _ref2;
+  var _ref2, _ref3;
 
   gyms = data;
 
-  terrains = (_ref = []).concat.apply(_ref, _toConsumableArray(gyms.features.map(function (feature) {
+  terrains = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(gyms.features.map(function (feature) {
     return feature.properties.terrains;
   })));
   terrains = terrains.filter(function (item, pos) {
@@ -136,7 +152,7 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
     return moment(b) - moment(a);
   });
 
-  dates = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(gyms.features.map(function (feature) {
+  dates = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(gyms.features.map(function (feature) {
     return feature.properties.dates;
   })));
   dates = dates.filter(function (item, pos) {

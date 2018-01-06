@@ -89,10 +89,16 @@ const addToMap = (filter = () => true) => {
   const isS2Toggled = map.hasLayer(s2LayerGroup);
   if (isS2Toggled) {
     onEachFeature = feature => {
-      if (s2CellCount[feature.properties.s2Cell]) {
-        s2CellCount[feature.properties.s2Cell]++;
+      const total = feature.properties.dates.length;
+      const s2Cell = s2CellCount[feature.properties.s2Cell];
+
+      if (s2Cell) {
+        s2CellCount[feature.properties.s2Cell] = {
+          count: s2Cell.count + 1,
+          total: s2Cell.total + total
+        };
       } else {
-        s2CellCount[feature.properties.s2Cell] = 1;
+        s2CellCount[feature.properties.s2Cell] = { count: 1, total };
       }
     };
   }
@@ -121,13 +127,19 @@ const addToMap = (filter = () => true) => {
 const overlayS2Labels = s2CellCount => {
   const markers = s2.features.map(feature => {
     const s2Cell = feature.properties.order;
-    const count = s2CellCount[s2Cell];
+    const { count, total } = s2CellCount[s2Cell] || {};
+    let html = "";
+    if (count > 1) {
+      html = `${s2Cell} (${count}x${total})`;
+    } else if (count) {
+      html = `${s2Cell} (${total})`;
+    }
     return L.marker(
       [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
       {
         icon: L.divIcon({
           className: "s2-label",
-          html: count ? `${s2Cell} (${count})` : ""
+          html
         })
       }
     );
