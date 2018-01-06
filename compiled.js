@@ -101,12 +101,12 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   // show submenu at start
   $('#primary-group [value="raids"]').trigger("change");
 
-  fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson").then(function (data) {
-    var s2Layer = L.geoJSON(data, {});
-    L.control.layers(null, {
-      "S2 L12": s2Layer
-    }).addTo(map);
-  });
+  return Promise.resolve();
+}).then(fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson")).then(function (data) {
+  var s2Layer = L.geoJSON(data, {});
+  L.control.layers(null, {
+    "S2 L12": s2Layer
+  }).addTo(map);
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function (e) {

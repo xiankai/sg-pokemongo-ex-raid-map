@@ -99,28 +99,36 @@ function addToMap(layer) {
 
 fetchLocal(
   "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2c81f0bb91e80cc14b8fe1fb9e14ba6cfd2a4500/all.geojson"
-).then(data => {
-  gyms = data;
+)
+  .then(data => {
+    gyms = data;
 
-  terrains = [].concat(
-    ...gyms.features.map(feature => feature.properties.terrains)
-  );
-  terrains = terrains
-    .filter((item, pos) => item && terrains.indexOf(item) === pos)
-    .sort((a, b) => moment(b) - moment(a));
+    terrains = [].concat(
+      ...gyms.features.map(feature => feature.properties.terrains)
+    );
+    terrains = terrains
+      .filter((item, pos) => item && terrains.indexOf(item) === pos)
+      .sort((a, b) => moment(b) - moment(a));
 
-  dates = [].concat(...gyms.features.map(feature => feature.properties.dates));
-  dates = dates
-    .filter((item, pos) => item && dates.indexOf(item) === pos)
-    .sort((a, b) => moment(b) - moment(a));
-  dates.reverse();
+    dates = [].concat(
+      ...gyms.features.map(feature => feature.properties.dates)
+    );
+    dates = dates
+      .filter((item, pos) => item && dates.indexOf(item) === pos)
+      .sort((a, b) => moment(b) - moment(a));
+    dates.reverse();
 
-  // show submenu at start
-  $('#primary-group [value="raids"]').trigger("change");
+    // show submenu at start
+    $('#primary-group [value="raids"]').trigger("change");
 
-  fetchLocal(
-    "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
-  ).then(data => {
+    return Promise.resolve();
+  })
+  .then(
+    fetchLocal(
+      "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
+    )
+  )
+  .then(data => {
     const s2Layer = L.geoJSON(data, {});
     L.control
       .layers(null, {
@@ -128,7 +136,6 @@ fetchLocal(
       })
       .addTo(map);
   });
-});
 
 $("#primary-group").on("change", 'input[type="radio"]', function(e) {
   currentFilter = e.target.value;
