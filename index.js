@@ -64,6 +64,8 @@ const map = L.map("map", {
   center: [1.358, 103.833],
   zoom: 12,
   minZoom: 10
+}).on("overlayadd", () => {
+  $("#secondary-group > .active > input").trigger("change");
 });
 let gyms;
 let s2;

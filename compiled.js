@@ -49,6 +49,8 @@ var map = L.map("map", {
   center: [1.358, 103.833],
   zoom: 12,
   minZoom: 10
+}).on("overlayadd", function () {
+  $("#secondary-group > .active > input").trigger("change");
 });
 var gyms = void 0;
 var s2 = void 0;
