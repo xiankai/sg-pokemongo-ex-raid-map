@@ -50,7 +50,7 @@ var map = L.map("map", {
   zoom: 12,
   minZoom: 10
 });
-var gyms;
+var gyms = void 0;
 var terrains = [];
 var dates = [];
 var currentFilter = "raids";
@@ -112,10 +112,11 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
 $("#primary-group").on("change", 'input[type="radio"]', function (e) {
   currentFilter = e.target.value;
   $("#secondary-group").empty();
-  var defaultButton;
+  var defaultButton = void 0;
+  var key = void 0;
   switch (e.target.value) {
     case "raids":
-      var key = "dates";
+      key = "dates";
       defaultButton = dates[dates.length - 1];
 
       dates.forEach(function (date) {
@@ -129,7 +130,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       addToMap(L.geoJSON(gyms));
       break;
     case "parks":
-      var key = "terrains";
+      key = "terrains";
       defaultButton = "2016-08-01";
       addToMap(L.geoJSON(gyms, {
         filter: function filter(feature) {

@@ -1,6 +1,6 @@
 function fetchLocal(url) {
   return new Promise(function(resolve, reject) {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onload = function() {
       resolve(JSON.parse(xhr.responseText));
     };
@@ -13,12 +13,12 @@ function fetchLocal(url) {
 }
 
 function renderPopup(layer) {
-  var feature = layer.feature;
-  var dates = feature.properties.dates;
-  var lngLat = feature.geometry.coordinates;
+  const feature = layer.feature;
+  const dates = feature.properties.dates;
+  let lngLat = feature.geometry.coordinates;
   lngLat = lngLat.map(x => Math.round(x * 1000000) / 1000000);
 
-  var exraidHTML = "";
+  let exraidHTML = "";
   if (dates && dates.length > 0) {
     exraidHTML += "<div>EX-raids:<ul>";
     dates.forEach(function(date) {
@@ -54,22 +54,22 @@ function renderPopup(layer) {
     `;
 }
 
-var markers = L.markerClusterGroup({
+const markers = L.markerClusterGroup({
   maxClusterRadius: () => {
     return currentFilter === "raids" ? 0 : 80;
   },
   disableClusteringAtZoom: 14,
   spiderfyOnMaxZoom: false
 });
-var map = L.map("map", {
+const map = L.map("map", {
   center: [1.358, 103.833],
   zoom: 12,
   minZoom: 10
 });
-var gyms;
-var terrains = [];
-var dates = [];
-var currentFilter = "raids";
+let gyms;
+let terrains = [];
+let dates = [];
+let currentFilter = "raids";
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
@@ -140,10 +140,11 @@ fetchLocal(
 $("#primary-group").on("change", 'input[type="radio"]', function(e) {
   currentFilter = e.target.value;
   $("#secondary-group").empty();
-  var defaultButton;
+  let defaultButton;
+  let key;
   switch (e.target.value) {
     case "raids":
-      var key = "dates";
+      key = "dates";
       defaultButton = dates[dates.length - 1];
 
       dates.forEach(date => {
@@ -167,7 +168,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
       addToMap(L.geoJSON(gyms));
       break;
     case "parks":
-      var key = "terrains";
+      key = "terrains";
       defaultButton = "2016-08-01";
       addToMap(
         L.geoJSON(gyms, {
@@ -203,7 +204,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function(e) {
 });
 
 $("#secondary-group").on("change", 'input[type="radio"]', function(e) {
-  var key = $(this).prop("name");
+  const key = $(this).prop("name");
   if (e.target.value === "all") {
     addToMap(
       L.geoJSON(gyms, {
