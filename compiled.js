@@ -2,7 +2,7 @@
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-function fetchLocal(url) {
+var fetchLocal = function fetchLocal(url) {
   return new Promise(function (resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
@@ -14,9 +14,9 @@ function fetchLocal(url) {
     xhr.open("GET", url);
     xhr.send(null);
   });
-}
+};
 
-function renderPopup(layer) {
+var renderPopup = function renderPopup(layer) {
   var feature = layer.feature;
   var dates = feature.properties.dates;
   var lngLat = feature.geometry.coordinates;
@@ -36,7 +36,7 @@ function renderPopup(layer) {
   }
 
   return "\n    <strong>\n    " + feature.properties.name + "\n    </strong>\n    " + exraidHTML + "\n    <div>S2 Cell: " + feature.properties.s2Cell + "</div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://www.google.com/maps/search/?api=1&query=" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        Google Maps\n      </a>\n    </div>\n    <br/>\n    <div>\n      <a target=\"_blank\" href=\"\n      https://sgpokemap.com/gym.html#" + lngLat[1] + "," + lngLat[0] + "\n      \">\n        SGPokemap\n      </a>\n    </div>\n    ";
-}
+};
 
 var markers = L.markerClusterGroup({
   maxClusterRadius: function maxClusterRadius() {
@@ -51,9 +51,13 @@ var map = L.map("map", {
   minZoom: 10
 });
 var gyms = void 0;
+var s2 = void 0;
 var terrains = [];
 var dates = [];
 var currentFilter = "raids";
+var s2TextLayer = L.geoJSON();
+var s2PolygonLayer = L.geoJSON();
+var s2LayerGroup = L.featureGroup([s2TextLayer, s2PolygonLayer]);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>'
@@ -61,18 +65,60 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 L.control.locate().addTo(map);
 
-L.Control.S2 = L.Control.extend({
-  onAdd: function onAdd() {
-    return $("\n      <div class=\"leaflet-bar leaflet-control-s2\">\n        <a>S2</a>\n      </div>\n    ").get(0);
-  }
-});
+var addToMap = function addToMap() {
+  var filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {
+    return true;
+  };
 
-function addToMap(layer) {
+  var s2CellCount = {};
+  var onEachFeature = function onEachFeature() {};
+  var isS2Toggled = map.hasLayer(s2LayerGroup);
+  if (isS2Toggled) {
+    onEachFeature = function onEachFeature(feature) {
+      if (s2CellCount[feature.properties.s2Cell]) {
+        s2CellCount[feature.properties.s2Cell]++;
+      } else {
+        s2CellCount[feature.properties.s2Cell] = 1;
+      }
+    };
+  }
+
+  var layer = L.geoJSON(gyms, {
+    filter: filter,
+    pointToLayer: function pointToLayer(geoJsonPoint, latLng) {
+      return L.marker(latLng, {
+        opacity: isS2Toggled ? 0.7 : 1
+      });
+    },
+    onEachFeature: onEachFeature
+  });
+
+  if (isS2Toggled) {
+    overlayS2Labels(s2CellCount);
+  }
+
   markers.clearLayers();
   markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
   map.addLayer(markers);
   return markers;
-}
+};
+
+var overlayS2Labels = function overlayS2Labels(s2CellCount) {
+  var markers = s2.features.map(function (feature) {
+    var s2Cell = feature.properties.order;
+    var count = s2CellCount[s2Cell];
+    return L.marker(feature.coordinates[0][3].reverse(), {
+      icon: L.divIcon({
+        className: "s2-label",
+        html: count ? s2Cell + " (" + count + ")" : ""
+      })
+    });
+  });
+
+  s2LayerGroup.removeLayer(s2TextLayer);
+  s2TextLayer = L.featureGroup(markers);
+  s2LayerGroup.addLayer(s2TextLayer);
+};
 
 fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2c81f0bb91e80cc14b8fe1fb9e14ba6cfd2a4500/all.geojson").then(function (data) {
   var _ref, _ref2;
@@ -102,11 +148,13 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   $('#primary-group [value="raids"]').trigger("change");
 
   return Promise.resolve();
-}).then(fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson")).then(function (data) {
-  var s2Layer = L.geoJSON(data, {});
-  L.control.layers(null, {
-    "S2 L12": s2Layer
-  }).addTo(map);
+}).then(function () {
+  return fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson");
+}).then(function (data) {
+  s2 = data;
+  s2PolygonLayer.addData(data);
+
+  L.control.layers(null, { "S2 L12": s2LayerGroup }).addTo(map);
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function (e) {
@@ -127,16 +175,14 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       $("#secondary-group").prepend("\n        <label class=\"btn btn-secondary\" for=\"all\">\n          <input type=\"radio\" name=\"" + key + "\" id=\"all\" value=\"all\" checked>\n          All\n        </label>\n      ");
       break;
     case "all":
-      addToMap(L.geoJSON(gyms));
+      addToMap();
       break;
     case "parks":
       key = "terrains";
       defaultButton = "2016-08-01";
-      addToMap(L.geoJSON(gyms, {
-        filter: function filter(feature) {
-          return feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1;
-        }
-      }));
+      addToMap(function (feature) {
+        return feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1;
+      });
 
       // default
       $("#secondary-group").append("\n        <label class=\"btn btn-light\" disabled>\n          Map date\n        </label>\n      ");
@@ -153,16 +199,12 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
 $("#secondary-group").on("change", 'input[type="radio"]', function (e) {
   var key = $(this).prop("name");
   if (e.target.value === "all") {
-    addToMap(L.geoJSON(gyms, {
-      filter: function filter(feature) {
-        return feature.properties[key] && feature.properties[key].length > 0;
-      }
-    }));
+    addToMap(function (feature) {
+      return feature.properties[key] && feature.properties[key].length > 0;
+    });
   } else {
-    addToMap(L.geoJSON(gyms, {
-      filter: function filter(feature) {
-        return feature.properties[key] && feature.properties[key].indexOf(e.target.value) > -1;
-      }
-    }));
+    addToMap(function (feature) {
+      return feature.properties[key] && feature.properties[key].indexOf(e.target.value) > -1;
+    });
   }
 });
