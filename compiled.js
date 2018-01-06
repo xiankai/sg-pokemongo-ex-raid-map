@@ -55,7 +55,7 @@ var s2 = void 0;
 var terrains = [];
 var dates = [];
 var currentFilter = "raids";
-var s2TextLayer = L.geoJSON();
+var s2TextLayer = L.featureGroup();
 var s2PolygonLayer = L.geoJSON();
 var s2LayerGroup = L.featureGroup([s2TextLayer, s2PolygonLayer]);
 
@@ -107,7 +107,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   var markers = s2.features.map(function (feature) {
     var s2Cell = feature.properties.order;
     var count = s2CellCount[s2Cell];
-    return L.marker(feature.coordinates[0][3].reverse(), {
+    return L.marker([feature.coordinates[0][3][1], feature.coordinates[0][3][0]], {
       icon: L.divIcon({
         className: "s2-label",
         html: count ? s2Cell + " (" + count + ")" : ""

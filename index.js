@@ -1,10 +1,10 @@
 const fetchLocal = url =>
-  new Promise(function(resolve, reject) {
+  new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
+    xhr.onload = () => {
       resolve(JSON.parse(xhr.responseText));
     };
-    xhr.onerror = function() {
+    xhr.onerror = () => {
       reject(new TypeError("Local request failed"));
     };
     xhr.open("GET", url);
@@ -20,7 +20,7 @@ const renderPopup = layer => {
   let exraidHTML = "";
   if (dates && dates.length > 0) {
     exraidHTML += "<div>EX-raids:<ul>";
-    dates.forEach(function(date) {
+    dates.forEach(date => {
       exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
     });
     exraidHTML += "</ul></div>";
@@ -70,7 +70,7 @@ let s2;
 let terrains = [];
 let dates = [];
 let currentFilter = "raids";
-let s2TextLayer = L.geoJSON();
+let s2TextLayer = L.featureGroup();
 const s2PolygonLayer = L.geoJSON();
 const s2LayerGroup = L.featureGroup([s2TextLayer, s2PolygonLayer]);
 
@@ -120,12 +120,15 @@ const overlayS2Labels = s2CellCount => {
   const markers = s2.features.map(feature => {
     const s2Cell = feature.properties.order;
     const count = s2CellCount[s2Cell];
-    return L.marker(feature.coordinates[0][3].reverse(), {
-      icon: L.divIcon({
-        className: "s2-label",
-        html: count ? `${s2Cell} (${count})` : ""
-      })
-    });
+    return L.marker(
+      [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
+      {
+        icon: L.divIcon({
+          className: "s2-label",
+          html: count ? `${s2Cell} (${count})` : ""
+        })
+      }
+    );
   });
 
   s2LayerGroup.removeLayer(s2TextLayer);
@@ -171,7 +174,7 @@ fetchLocal(
     L.control.layers(null, { "S2 L12": s2LayerGroup }).addTo(map);
   });
 
-$("#primary-group").on("change", 'input[type="radio"]', function(e) {
+$("#primary-group").on("change", 'input[type="radio"]', e => {
   currentFilter = e.target.value;
   $("#secondary-group").empty();
   let defaultButton;
