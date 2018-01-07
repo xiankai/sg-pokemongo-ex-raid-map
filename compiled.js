@@ -200,9 +200,9 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   s2PolygonLayer.addData(data);
 
   L.control.layers(null, {
-    "S2 L12": s2LayerGroup,
-    "Locations per cell": s2CountsLayerGroup,
-    "Total raids per cell": s2TotalsLayerGroup
+    "S2 cells L12 grid": s2LayerGroup,
+    "Locations per cell (red)": s2CountsLayerGroup,
+    "Total raids per cell (blue)": s2TotalsLayerGroup
   }).addTo(map);
 });
 
