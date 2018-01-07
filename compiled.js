@@ -53,13 +53,16 @@ var map = L.map("map", {
   $("#secondary-group > .active > input").trigger("change");
 });
 var gyms = void 0;
-var s2 = void 0;
+var s2latLngs = void 0;
 var terrains = [];
 var dates = [];
 var currentFilter = "raids";
-var s2TextLayer = L.featureGroup();
+var s2LocationCountLayer = L.featureGroup();
+var s2TotaRaidsLayer = L.featureGroup();
 var s2PolygonLayer = L.geoJSON();
-var s2LayerGroup = L.featureGroup([s2TextLayer, s2PolygonLayer]);
+var s2LayerGroup = L.featureGroup([s2PolygonLayer]);
+var s2CountsLayerGroup = L.featureGroup();
+var s2TotalsLayerGroup = L.featureGroup();
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>'
@@ -112,38 +115,52 @@ var addToMap = function addToMap() {
 };
 
 var overlayS2Labels = function overlayS2Labels(s2CellCount) {
-  var markers = s2.features.map(function (feature) {
-    var s2Cell = feature.properties.order;
-
-    var _ref = s2CellCount[s2Cell] || {},
-        count = _ref.count,
-        total = _ref.total;
-
-    var html = "";
-    if (count > 1) {
-      html = s2Cell + " (" + count + "x" + total + ")";
-    } else if (count) {
-      html = s2Cell + " (" + total + ")";
-    }
-    return L.marker([feature.coordinates[0][3][1], feature.coordinates[0][3][0]], {
+  var s2Cells = L.featureGroup(s2latLngs.map(function (_ref) {
+    var s2Cell = _ref.s2Cell,
+        topleft = _ref.topleft;
+    return L.marker(topleft, {
       icon: L.divIcon({
         className: "s2-label",
-        html: html
+        html: s2Cell
       })
     });
-  });
+  }));
 
-  s2LayerGroup.removeLayer(s2TextLayer);
-  s2TextLayer = L.featureGroup(markers);
-  s2LayerGroup.addLayer(s2TextLayer);
+  var counts = L.featureGroup(s2latLngs.map(function (_ref2) {
+    var s2Cell = _ref2.s2Cell,
+        topright = _ref2.topright;
+    return L.marker(topright, {
+      icon: L.divIcon({
+        className: "s2-label s2-count",
+        html: s2CellCount[s2Cell] ? s2CellCount[s2Cell].count : ""
+      })
+    });
+  }));
+
+  var totals = L.featureGroup(s2latLngs.map(function (_ref3) {
+    var s2Cell = _ref3.s2Cell,
+        bottomleft = _ref3.bottomleft;
+    return L.marker(bottomleft, {
+      icon: L.divIcon({
+        className: "s2-label s2-total",
+        html: s2CellCount[s2Cell] ? s2CellCount[s2Cell].total : ""
+      })
+    });
+  }));
+
+  s2LayerGroup.clearLayers();
+  s2LayerGroup.addLayer(s2PolygonLayer);
+  s2LayerGroup.addLayer(s2Cells);
+  s2CountsLayerGroup.addLayer(counts);
+  s2TotalsLayerGroup.addLayer(totals);
 };
 
 fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/2c81f0bb91e80cc14b8fe1fb9e14ba6cfd2a4500/all.geojson").then(function (data) {
-  var _ref2, _ref3;
+  var _ref4, _ref5;
 
   gyms = data;
 
-  terrains = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(gyms.features.map(function (feature) {
+  terrains = (_ref4 = []).concat.apply(_ref4, _toConsumableArray(gyms.features.map(function (feature) {
     return feature.properties.terrains;
   })));
   terrains = terrains.filter(function (item, pos) {
@@ -152,7 +169,7 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
     return moment(b) - moment(a);
   });
 
-  dates = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(gyms.features.map(function (feature) {
+  dates = (_ref5 = []).concat.apply(_ref5, _toConsumableArray(gyms.features.map(function (feature) {
     return feature.properties.dates;
   })));
   dates = dates.filter(function (item, pos) {
@@ -169,10 +186,22 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
 }).then(function () {
   return fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson");
 }).then(function (data) {
-  s2 = data;
+  s2latLngs = data.features.map(function (feature) {
+    return {
+      topleft: [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
+      topright: [feature.coordinates[0][2][1], feature.coordinates[0][2][0]],
+      bottomright: [feature.coordinates[0][1][1], feature.coordinates[0][1][0]],
+      bottomleft: [feature.coordinates[0][0][1], feature.coordinates[0][0][0]],
+      s2Cell: feature.properties.order
+    };
+  });
   s2PolygonLayer.addData(data);
 
-  L.control.layers(null, { "S2 L12": s2LayerGroup }).addTo(map);
+  L.control.layers(null, {
+    "S2 L12": s2LayerGroup,
+    "Locations per cell": s2CountsLayerGroup,
+    "Total raids per cell": s2TotalsLayerGroup
+  }).addTo(map);
 });
 
 $("#primary-group").on("change", 'input[type="radio"]', function (e) {
