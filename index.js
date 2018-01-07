@@ -80,6 +80,7 @@ const s2CountsLayerGroup = L.featureGroup();
 const s2TotalsLayerGroup = L.featureGroup();
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  // L.tileLayer("http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>'
 }).addTo(map);
