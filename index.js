@@ -68,15 +68,19 @@ const map = L.map("map", {
   $("#secondary-group > .active > input").trigger("change");
 });
 let gyms;
-let s2;
+let s2latLngs;
 let terrains = [];
 let dates = [];
 let currentFilter = "raids";
-let s2TextLayer = L.featureGroup();
+const s2LocationCountLayer = L.featureGroup();
+const s2TotaRaidsLayer = L.featureGroup();
 const s2PolygonLayer = L.geoJSON();
-const s2LayerGroup = L.featureGroup([s2TextLayer, s2PolygonLayer]);
+const s2LayerGroup = L.featureGroup([s2PolygonLayer]);
+const s2CountsLayerGroup = L.featureGroup();
+const s2TotalsLayerGroup = L.featureGroup();
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  // L.tileLayer("http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>'
 }).addTo(map);
@@ -125,29 +129,46 @@ const addToMap = (filter = () => true) => {
 };
 
 const overlayS2Labels = s2CellCount => {
-  const markers = s2.features.map(feature => {
-    const s2Cell = feature.properties.order;
-    const { count, total } = s2CellCount[s2Cell] || {};
-    let html = "";
-    if (count > 1) {
-      html = `${s2Cell} (${count}x${total})`;
-    } else if (count) {
-      html = `${s2Cell} (${total})`;
-    }
-    return L.marker(
-      [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
-      {
+  const s2Cells = L.featureGroup(
+    s2latLngs.map(({ s2Cell, topleft }) =>
+      L.marker(topleft, {
         icon: L.divIcon({
           className: "s2-label",
-          html
+          html: s2CellCount[s2Cell] ? s2Cell : ""
         })
-      }
-    );
-  });
+      })
+    )
+  );
 
-  s2LayerGroup.removeLayer(s2TextLayer);
-  s2TextLayer = L.featureGroup(markers);
-  s2LayerGroup.addLayer(s2TextLayer);
+  const counts = L.featureGroup(
+    s2latLngs.map(({ s2Cell, topright }) =>
+      L.marker(topright, {
+        icon: L.divIcon({
+          className: "s2-label s2-count",
+          html: s2CellCount[s2Cell] ? s2CellCount[s2Cell].count : ""
+        })
+      })
+    )
+  );
+
+  const totals = L.featureGroup(
+    s2latLngs.map(({ s2Cell, bottomleft }) =>
+      L.marker(bottomleft, {
+        icon: L.divIcon({
+          className: "s2-label s2-total",
+          html: s2CellCount[s2Cell] ? s2CellCount[s2Cell].total : ""
+        })
+      })
+    )
+  );
+
+  s2LayerGroup.clearLayers();
+  s2CountsLayerGroup.clearLayers();
+  s2TotalsLayerGroup.clearLayers();
+  s2LayerGroup.addLayer(s2PolygonLayer);
+  s2LayerGroup.addLayer(s2Cells);
+  s2CountsLayerGroup.addLayer(counts);
+  s2TotalsLayerGroup.addLayer(totals);
 };
 
 fetchLocal(
@@ -182,10 +203,22 @@ fetchLocal(
     )
   )
   .then(data => {
-    s2 = data;
+    s2latLngs = data.features.map(feature => ({
+      topleft: [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
+      topright: [feature.coordinates[0][2][1], feature.coordinates[0][2][0]],
+      bottomright: [feature.coordinates[0][1][1], feature.coordinates[0][1][0]],
+      bottomleft: [feature.coordinates[0][0][1], feature.coordinates[0][0][0]],
+      s2Cell: feature.properties.order
+    }));
     s2PolygonLayer.addData(data);
 
-    L.control.layers(null, { "S2 L12": s2LayerGroup }).addTo(map);
+    L.control
+      .layers(null, {
+        "S2 cells L12 grid": s2LayerGroup,
+        "Locations per cell (red)": s2CountsLayerGroup,
+        "Total raids per cell (blue)": s2TotalsLayerGroup
+      })
+      .addTo(map);
   });
 
 $("#primary-group").on("change", 'input[type="radio"]', e => {
