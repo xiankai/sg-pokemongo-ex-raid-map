@@ -149,6 +149,8 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   }));
 
   s2LayerGroup.clearLayers();
+  s2CountsLayerGroup.clearLayers();
+  s2TotalsLayerGroup.clearLayers();
   s2LayerGroup.addLayer(s2PolygonLayer);
   s2LayerGroup.addLayer(s2Cells);
   s2CountsLayerGroup.addLayer(counts);
