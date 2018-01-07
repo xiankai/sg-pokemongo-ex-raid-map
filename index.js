@@ -133,7 +133,7 @@ const overlayS2Labels = s2CellCount => {
       L.marker(topleft, {
         icon: L.divIcon({
           className: "s2-label",
-          html: s2Cell
+          html: s2CellCount[s2Cell] ? s2Cell : ""
         })
       })
     )
