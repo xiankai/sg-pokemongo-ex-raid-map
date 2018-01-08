@@ -172,54 +172,66 @@ const overlayS2Labels = s2CellCount => {
 };
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/6ce5d05ce58e7c01987490bcf4696ce3d0ef6ef6/all.geojson"
+	'https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3e0cdc79bbb470e59306e8a28213ccb8212da026/all.geojson'
 )
-  .then(data => {
-    gyms = data;
+	.then(data => {
+		gyms = data;
 
-    terrains = [].concat(
-      ...gyms.features.map(feature => feature.properties.terrains)
-    );
-    terrains = terrains
-      .filter((item, pos) => item && terrains.indexOf(item) === pos)
-      .sort((a, b) => moment(b) - moment(a));
+		terrains = [].concat(
+			...gyms.features.map(feature => feature.properties.terrains)
+		);
+		terrains = terrains
+			.filter((item, pos) => item && terrains.indexOf(item) === pos)
+			.sort((a, b) => moment(b) - moment(a));
 
-    dates = [].concat(
-      ...gyms.features.map(feature => feature.properties.dates)
-    );
-    dates = dates
-      .filter((item, pos) => item && dates.indexOf(item) === pos)
-      .sort((a, b) => moment(b) - moment(a));
-    dates.reverse();
+		dates = [].concat(
+			...gyms.features.map(feature => feature.properties.dates)
+		);
+		dates = dates
+			.filter((item, pos) => item && dates.indexOf(item) === pos)
+			.sort((a, b) => moment(b) - moment(a));
+		dates.reverse();
 
-    // show submenu at start
-    $('#primary-group [value="raids"]').trigger("change");
+		// show submenu at start
+		$('#primary-group [value="raids"]').trigger('change');
 
-    return Promise.resolve();
-  })
-  .then(() =>
-    fetchLocal(
-      "https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson"
-    )
-  )
-  .then(data => {
-    s2latLngs = data.features.map(feature => ({
-      topleft: [feature.coordinates[0][3][1], feature.coordinates[0][3][0]],
-      topright: [feature.coordinates[0][2][1], feature.coordinates[0][2][0]],
-      bottomright: [feature.coordinates[0][1][1], feature.coordinates[0][1][0]],
-      bottomleft: [feature.coordinates[0][0][1], feature.coordinates[0][0][0]],
-      s2Cell: feature.properties.order
-    }));
-    s2PolygonLayer.addData(data);
+		return Promise.resolve();
+	})
+	.then(() =>
+		fetchLocal(
+			'https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson'
+		)
+	)
+	.then(data => {
+		s2latLngs = data.features.map(feature => ({
+			topleft: [
+				feature.coordinates[0][3][1],
+				feature.coordinates[0][3][0],
+			],
+			topright: [
+				feature.coordinates[0][2][1],
+				feature.coordinates[0][2][0],
+			],
+			bottomright: [
+				feature.coordinates[0][1][1],
+				feature.coordinates[0][1][0],
+			],
+			bottomleft: [
+				feature.coordinates[0][0][1],
+				feature.coordinates[0][0][0],
+			],
+			s2Cell: feature.properties.order,
+		}));
+		s2PolygonLayer.addData(data);
 
-    L.control
-      .layers(null, {
-        "S2 cells L12 grid": s2LayerGroup,
-        "Locations per cell (red)": s2CountsLayerGroup,
-        "Total raids per cell (blue)": s2TotalsLayerGroup
-      })
-      .addTo(map);
-  });
+		L.control
+			.layers(null, {
+				'S2 cells L12 grid': s2LayerGroup,
+				'Locations per cell (red)': s2CountsLayerGroup,
+				'Total raids per cell (blue)': s2TotalsLayerGroup,
+			})
+			.addTo(map);
+	});
 
 $("#primary-group").on("change", 'input[type="radio"]', e => {
   currentFilter = e.target.value;
