@@ -158,7 +158,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   s2TotalsLayerGroup.addLayer(totals);
 };
 
-fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/3e0cdc79bbb470e59306e8a28213ccb8212da026/all.geojson').then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/6b1d15654179279d017cab052743760be1043e83/all.geojson").then(function (data) {
   var _ref4, _ref5;
 
   gyms = data;
@@ -183,11 +183,11 @@ fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   dates.reverse();
 
   // show submenu at start
-  $('#primary-group [value="raids"]').trigger('change');
+  $('#primary-group [value="raids"]').trigger("change");
 
   return Promise.resolve();
 }).then(function () {
-  return fetchLocal('https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson');
+  return fetchLocal("https://cdn.rawgit.com/xiankai/0f2af25f0cd91d16cb59f846fa2bde36/raw/de48c7b21d497265f2254260bccd6cd464442139/S2.geojson");
 }).then(function (data) {
   s2latLngs = data.features.map(function (feature) {
     return {
@@ -201,9 +201,9 @@ fetchLocal('https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   s2PolygonLayer.addData(data);
 
   L.control.layers(null, {
-    'S2 cells L12 grid': s2LayerGroup,
-    'Locations per cell (red)': s2CountsLayerGroup,
-    'Total raids per cell (blue)': s2TotalsLayerGroup
+    "S2 cells L12 grid": s2LayerGroup,
+    "Locations per cell (red)": s2CountsLayerGroup,
+    "Total raids per cell (blue)": s2TotalsLayerGroup
   }).addTo(map);
 });
 
