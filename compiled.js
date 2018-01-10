@@ -158,7 +158,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   s2TotalsLayerGroup.addLayer(totals);
 };
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/c6e54bf1fdea44af96b94eb1eb28bfc22ea439f5/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/be1b87fdaac080b760117340051d08bcbcfe8b6b/all.geojson").then(function (data) {
   var _ref4, _ref5;
 
   gyms = data;
