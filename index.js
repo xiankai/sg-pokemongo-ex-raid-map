@@ -119,7 +119,16 @@ const addToMap = (filter = () => true) => {
 
   // add markers to search control
   map.removeControl(searchControl);
-  searchControl = new L.Control.Search({ layer, propertyName: "name" });
+  searchControl = new L.Control.Search({
+    layer,
+    propertyName: "name",
+    initial: false,
+    hideMarkerOnCollapse: true
+    // moveToLocation: (latlng, title, map) => {
+    //   map.panTo(latlng);
+    //   markers.openPopup(L.latLng(latlng.lat, latlng.lng));
+    // },
+  });
   map.addControl(searchControl);
 
   if (isS2Toggled) {
