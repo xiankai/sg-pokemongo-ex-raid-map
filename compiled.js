@@ -54,6 +54,7 @@ var map = L.map("map", {
 });
 var gyms = void 0;
 var s2latLngs = void 0;
+var searchControl = new L.Control.Search();
 var terrains = [];
 var dates = [];
 var currentFilter = "raids";
@@ -104,6 +105,11 @@ var addToMap = function addToMap() {
     },
     onEachFeature: onEachFeature
   });
+
+  // add markers to search control
+  map.removeControl(searchControl);
+  searchControl = new L.Control.Search({ layer: layer, propertyName: "name" });
+  map.addControl(searchControl);
 
   if (isS2Toggled) {
     overlayS2Labels(s2CellCount);
