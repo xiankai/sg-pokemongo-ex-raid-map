@@ -26,6 +26,7 @@ var renderPopup = function renderPopup(layer) {
 
   var exraidHTML = "";
   if (dates && dates.length > 0) {
+    dates.reverse();
     exraidHTML += "<div>EX-raids:<ul>";
     dates.forEach(function (date) {
       exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
