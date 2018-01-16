@@ -107,13 +107,21 @@ var addToMap = function addToMap() {
     onEachFeature: onEachFeature
   });
 
+  if (isS2Toggled) {
+    overlayS2Labels(s2CellCount);
+  }
+
+  markers.clearLayers();
+  markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
+
   // add markers to search control
   map.removeControl(searchControl);
   searchControl = new L.Control.Search({
-    layer: layer,
+    layer: markers,
     propertyName: "name",
     initial: false,
-    hideMarkerOnCollapse: true
+    hideMarkerOnCollapse: true,
+    zoom: 14
     // moveToLocation: (latlng, title, map) => {
     //   map.panTo(latlng);
     //   markers.openPopup(L.latLng(latlng.lat, latlng.lng));
@@ -121,12 +129,6 @@ var addToMap = function addToMap() {
   });
   map.addControl(searchControl);
 
-  if (isS2Toggled) {
-    overlayS2Labels(s2CellCount);
-  }
-
-  markers.clearLayers();
-  markers.addLayer(layer).bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
   map.addLayer(markers);
   return markers;
 };
@@ -174,7 +176,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   s2TotalsLayerGroup.addLayer(totals);
 };
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/f483fa75d23e38abd2a93e712ca7071e565b14db/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/6a8d094f3698ae43e3e8e02f9c58a33cf0909e16/all.geojson").then(function (data) {
   var _ref4, _ref5;
 
   gyms = data;
@@ -245,7 +247,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       break;
     case "parks":
       key = "terrains";
-      defaultButton = "2016-08-01";
+      defaultButton = "July 2016";
       addToMap(function (feature) {
         return feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1;
       });
@@ -254,7 +256,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       $("#secondary-group").append("\n        <label class=\"btn btn-light\" disabled>\n          Map date\n        </label>\n      ");
 
       terrains.forEach(function (terrain) {
-        $("#secondary-group").append("\n          <label class=\"btn btn-secondary\" for=\"" + terrain + "\">\n            <input type=\"radio\" name=\"" + key + "\" id=\"" + terrain + "\" value=\"" + terrain + "\"\n              " + (terrain === defaultButton ? "checked" : "") + ">\n            " + moment(terrain).format("MMM YYYY") + "\n          </label>\n        ");
+        $("#secondary-group").append("\n          <label class=\"btn btn-secondary\" for=\"" + terrain + "\">\n            <input type=\"radio\" name=\"" + key + "\" id=\"" + terrain + "\" value=\"" + terrain + "\"\n              " + (terrain === defaultButton ? "checked" : "") + ">\n            " + terrain + "\n          </label>\n        ");
       });
       break;
   }
