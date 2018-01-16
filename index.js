@@ -270,7 +270,7 @@ $("#primary-group").on("change", 'input[type="radio"]', e => {
       break;
     case "parks":
       key = "terrains";
-      defaultButton = "2016-08-01";
+      defaultButton = "July 2016";
       addToMap(
         feature =>
           feature.properties[key] &&
@@ -289,7 +289,7 @@ $("#primary-group").on("change", 'input[type="radio"]', e => {
           <label class="btn btn-secondary" for="${terrain}">
             <input type="radio" name="${key}" id="${terrain}" value="${terrain}"
               ${terrain === defaultButton ? "checked" : ""}>
-            ${moment(terrain).format("MMM YYYY")}
+            ${terrain}
           </label>
         `);
       });
