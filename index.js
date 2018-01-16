@@ -133,7 +133,8 @@ const addToMap = (filter = () => true) => {
     layer: markers,
     propertyName: "name",
     initial: false,
-    hideMarkerOnCollapse: true
+    hideMarkerOnCollapse: true,
+    zoom: 14
     // moveToLocation: (latlng, title, map) => {
     //   map.panTo(latlng);
     //   markers.openPopup(L.latLng(latlng.lat, latlng.lng));
