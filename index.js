@@ -118,10 +118,19 @@ const addToMap = (filter = () => true) => {
     onEachFeature
   });
 
+  if (isS2Toggled) {
+    overlayS2Labels(s2CellCount);
+  }
+
+  markers.clearLayers();
+  markers
+    .addLayer(layer)
+    .bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
+
   // add markers to search control
   map.removeControl(searchControl);
   searchControl = new L.Control.Search({
-    layer,
+    layer: markers,
     propertyName: "name",
     initial: false,
     hideMarkerOnCollapse: true
@@ -132,14 +141,6 @@ const addToMap = (filter = () => true) => {
   });
   map.addControl(searchControl);
 
-  if (isS2Toggled) {
-    overlayS2Labels(s2CellCount);
-  }
-
-  markers.clearLayers();
-  markers
-    .addLayer(layer)
-    .bindPopup(renderPopup, { autoPanPaddingTopLeft: [100, 100] });
   map.addLayer(markers);
   return markers;
 };
