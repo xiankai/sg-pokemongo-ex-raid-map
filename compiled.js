@@ -26,11 +26,10 @@ var renderPopup = function renderPopup(layer) {
 
   var exraidHTML = "";
   if (dates && dates.length > 0) {
-    dates.reverse();
-    exraidHTML += "<div>EX-raids:<ul>";
     dates.forEach(function (date) {
-      exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
+      exraidHTML = "<li>" + moment(date).format("D MMM") + "</li>" + exraidHTML;
     });
+    exraidHTML = "<div>EX-raids:<ul>" + exraidHTML;
     exraidHTML += "</ul></div>";
   } else {
     exraidHTML += "<div>No EX-raid yet</div>";
@@ -176,7 +175,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   s2TotalsLayerGroup.addLayer(totals);
 };
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/6a8d094f3698ae43e3e8e02f9c58a33cf0909e16/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/032d76db9e8b3bdeb42bfe3ef251e7347eee0d81/all.geojson").then(function (data) {
   var _ref4, _ref5;
 
   gyms = data;
@@ -196,9 +195,8 @@ fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/
   dates = dates.filter(function (item, pos) {
     return item && dates.indexOf(item) === pos;
   }).sort(function (a, b) {
-    return moment(b) - moment(a);
+    return moment(a) - moment(b);
   });
-  dates.reverse();
 
   // show submenu at start
   $('#primary-group [value="raids"]').trigger("change");
