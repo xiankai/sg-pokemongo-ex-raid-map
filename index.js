@@ -19,11 +19,10 @@ const renderPopup = layer => {
 
   let exraidHTML = "";
   if (dates && dates.length > 0) {
-    dates.reverse();
-    exraidHTML += "<div>EX-raids:<ul>";
     dates.forEach(date => {
-      exraidHTML += "<li>" + moment(date).format("D MMM") + "</li>";
+      exraidHTML = "<li>" + moment(date).format("D MMM") + "</li>" + exraidHTML;
     });
+    exraidHTML = "<div>EX-raids:<ul>" + exraidHTML;
     exraidHTML += "</ul></div>";
   } else {
     exraidHTML += "<div>No EX-raid yet</div>";
@@ -207,8 +206,7 @@ fetchLocal(
     );
     dates = dates
       .filter((item, pos) => item && dates.indexOf(item) === pos)
-      .sort((a, b) => moment(b) - moment(a));
-    dates.reverse();
+      .sort((a, b) => moment(a) - moment(b));
 
     // show submenu at start
     $('#primary-group [value="raids"]').trigger("change");
