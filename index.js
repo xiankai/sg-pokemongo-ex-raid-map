@@ -189,7 +189,7 @@ const overlayS2Labels = s2CellCount => {
 };
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/c4463ecf25299e76cae0f9075b2c2e05a2a0124c/all.geojson"
+  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/87d3726c3b0cefbbd989c0bf047f3df70e260d04/all.geojson"
 )
   .then(data => {
     gyms = data;
