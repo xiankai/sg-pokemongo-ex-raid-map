@@ -62,7 +62,18 @@
 
         #secondary-group {
             overflow: auto;
-            max-width: 100%;
+        }
+
+        @media screen and (max-width: 600px) {
+            #secondary-group {
+                width: 100%;
+            }
+        }
+
+        @media screen and (min-width: 600px) {
+            #secondary-group {
+                width: calc(100% - 345px);
+            }
         }
 
         label {
