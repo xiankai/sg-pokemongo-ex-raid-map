@@ -120,6 +120,7 @@ var addToMap = function addToMap() {
     propertyName: "name",
     initial: false,
     hideMarkerOnCollapse: true,
+    autoCollapse: true,
     zoom: 14
     // moveToLocation: (latlng, title, map) => {
     //   map.panTo(latlng);
