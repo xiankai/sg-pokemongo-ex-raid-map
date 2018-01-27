@@ -176,7 +176,7 @@ var overlayS2Labels = function overlayS2Labels(s2CellCount) {
   s2TotalsLayerGroup.addLayer(totals);
 };
 
-fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/87d3726c3b0cefbbd989c0bf047f3df70e260d04/all.geojson").then(function (data) {
+fetchLocal("https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/a0995def1de25b1ca44cde77db53a82d76769e29/all.geojson").then(function (data) {
   var _ref4, _ref5;
 
   gyms = data;
@@ -246,7 +246,7 @@ $("#primary-group").on("change", 'input[type="radio"]', function (e) {
       break;
     case "parks":
       key = "terrains";
-      defaultButton = "July 2016";
+      defaultButton = "Park L20 Cell";
       addToMap(function (feature) {
         return feature.properties[key] && feature.properties[key].indexOf(defaultButton) > -1;
       });

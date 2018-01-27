@@ -190,7 +190,7 @@ const overlayS2Labels = s2CellCount => {
 };
 
 fetchLocal(
-  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/87d3726c3b0cefbbd989c0bf047f3df70e260d04/all.geojson"
+  "https://cdn.rawgit.com/xiankai/fc4260e305d1339756a3e1a02b495939/raw/a0995def1de25b1ca44cde77db53a82d76769e29/all.geojson"
 )
   .then(data => {
     gyms = data;
@@ -270,7 +270,7 @@ $("#primary-group").on("change", 'input[type="radio"]', e => {
       break;
     case "parks":
       key = "terrains";
-      defaultButton = "July 2016";
+      defaultButton = "Park L20 Cell";
       addToMap(
         feature =>
           feature.properties[key] &&
