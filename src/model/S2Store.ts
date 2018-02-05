@@ -1,4 +1,4 @@
-import { divIcon, featureGroup, geoJSON, marker, control } from 'leaflet';
+import { control, divIcon, featureGroup, geoJSON, marker } from 'leaflet';
 import { IS2GeoJSON, IS2GeoJSONFeature } from '../@types/geojson';
 import MapStore, { IS2CellCount } from './MapStore';
 
