@@ -33,7 +33,13 @@ class MapStore {
 	public markers: LayerGroup;
 
 	public terrains = observable([]);
+	public defaultTerrain = computed(() => {
+		return this.terrains.slice()[0];
+	});
 	public dates = observable([]);
+	public defaultDate = computed(() => {
+		return this.dates.slice()[0];
+	});
 	public gyms: IGeoJSONFeature[] = observable([]);
 
 	public active = observable('dates');
@@ -108,8 +114,10 @@ class MapStore {
 			const key = this.activeFilter.get();
 			switch (key) {
 				case 'terrains':
+					this.activeSecondary.set(this.defaultTerrain.get());
+					break;
 				case 'dates':
-					this.activeSecondary.set(this[key].slice()[0]);
+					this.activeSecondary.set(this.defaultDate.get());
 					break;
 				default:
 					this.addToMap();
