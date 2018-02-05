@@ -7,6 +7,7 @@ import {
 	markerClusterGroup,
 } from 'leaflet';
 import 'leaflet.markercluster';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { autorun, computed, observable, reaction } from 'mobx';
 import * as moment from 'moment';
 import {
@@ -225,6 +226,7 @@ class MapStore {
 						iconUrl: `${
 							process.env.PUBLIC_URL
 						}/markers/${customMarker}.png`,
+						shadowUrl,
 						popupAnchor: [0, -28],
 					});
 				}
