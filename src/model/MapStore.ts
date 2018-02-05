@@ -1,6 +1,6 @@
 import {
 	geoJSON,
-	// icon,
+	icon,
 	LayerGroup,
 	Map,
 	marker,
@@ -151,11 +151,11 @@ class MapStore {
 					feature.properties[key].length > 0
 				);
 			} else {
-				return (
+					return (
 					feature.properties[key] &&
 					feature.properties[key].indexOf(value) > -1
-				);
-			}
+					);
+				}
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};
@@ -184,25 +184,43 @@ class MapStore {
 			type: 'FeatureCollection',
 		};
 
-		const markerOptions: any = {
-			opacity: isS2Toggled ? 0.7 : 1,
-		};
-
-		// switch (key) {
-		// 	case 'terrains':
-		// 		markerOptions.icon = icon({
-		// 			iconAnchor: [12, 41],
-		// 			iconUrl: process.env.PUBLIC_URL + '/markers/green.png',
-		// 			popupAnchor: [0, -28],
-		// 		});
-		// 		break;
-		// }
-
 		this.layer = geoJSON(FeatureCollection, {
 			filter,
 			onEachFeature,
-			pointToLayer: (geoJsonPoint, latLng) =>
-				marker(latLng, markerOptions),
+			pointToLayer: (geoJsonPoint, latLng) => {
+				const markerOptions: any = {
+					opacity: isS2Toggled ? 0.7 : 1,
+				};
+
+				const { terrains, dates } = geoJsonPoint.properties;
+
+				let customMarker = '';
+				if (terrains.length > 0) {
+					customMarker = 'green';
+				}
+
+				if (dates.length > 0) {
+					customMarker = 'black';
+				}
+
+				// Take away 2 for the EX-raid tests
+				// Divide by 2 for raids that occur almost every 2 weeks
+				if (dates.length >= Math.floor((this.dates.length - 2) / 2)) {
+					customMarker = 'red';
+				}
+
+				if (customMarker) {
+					markerOptions.icon = icon({
+						iconAnchor: [12, 41],
+						iconUrl: `${
+							process.env.PUBLIC_URL
+						}/markers/${customMarker}.png`,
+						popupAnchor: [0, -28],
+					});
+				}
+
+				return marker(latLng, markerOptions);
+			},
 		});
 
 		if (isS2Toggled) {
