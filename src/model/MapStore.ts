@@ -227,7 +227,7 @@ class MapStore {
 							process.env.PUBLIC_URL
 						}/markers/${customMarker}.png`,
 						shadowUrl,
-						popupAnchor: [0, -28],
+						popupAnchor: [0, -32],
 					});
 				}
 
