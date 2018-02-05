@@ -1,0 +1,50 @@
+.btn-group {
+	z-index: 1;
+	position: relative;
+	display: inline-flex;
+	vertical-align: top;
+}
+
+.btn {
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	user-select: none;
+	border: 1px solid transparent;
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	line-height: 1.25;
+	border-radius: 0.25rem;
+	transition: all 0.15s ease-in-out;
+	color: #fff;
+	background-color: #868e96;
+	border-color: #868e96;
+	cursor: pointer;
+}
+
+.btn-group > .btn {
+	border-radius: 0;
+}
+
+.btn.active,
+.btn:hover {
+	background-color: #727b84;
+	background-image: none;
+	border-color: #6c757d;
+}
+
+.primary-filter {
+	margin-right: 1em;
+}
+
+.secondary-filter {
+	overflow: auto;
+}
+
+@media screen and (min-width: 600px) {
+	.secondary-filter {
+		width: calc(100% - 345px);
+	}
+}

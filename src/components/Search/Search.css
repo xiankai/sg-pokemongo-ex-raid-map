@@ -1,0 +1,25 @@
+.leaflet-container .leaflet-control-search {
+	/* From .leaflet-bar */
+	box-shadow: none;
+	border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-control-search .search-input {
+	height: 24px;
+}
+
+.leaflet-control-search .search-cancel {
+	right: 28px;
+	margin: 5px 0;
+}
+
+.leaflet-control-search .search-button:hover {
+	background: url(./search-icon.png) no-repeat 4px 4px #fff;
+}
+.leaflet-control-search .search-button {
+	background: url(./search-icon.png) no-repeat 4px 4px #fff;
+	/* From .leaflet-bar */
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+}
