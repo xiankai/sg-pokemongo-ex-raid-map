@@ -1,9 +1,0 @@
-{
-	"plugins": ["prettier"],
-	"rules": {
-		"prettier/prettier": "error",
-		"prefer-const": "error",
-		"no-var": "error"
-	},
-    "parser": "babel-eslint"
-}
