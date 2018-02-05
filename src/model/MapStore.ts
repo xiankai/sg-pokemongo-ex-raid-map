@@ -55,13 +55,13 @@ class MapStore {
 		return activeFilter ? activeFilter.name : null;
 	});
 
-	public activeSecondary = observable('All');
+	public activeSecondary = observable('Potential');
 	public secondaryFilter = computed(() => {
 		switch (this.activeFilter.get()) {
 			case 'terrains':
 				return this.terrains;
 			case 'dates':
-				return [].concat('All', this.dates.slice());
+				return [].concat('All', 'Potential', this.dates.slice());
 			default:
 				return [];
 		}
@@ -108,6 +108,9 @@ class MapStore {
 							moment(a, rawDateFormat, true).unix()
 					)
 			);
+
+			// Run once. Have to do this for "Potential"
+			this.addToMap(this.activeFilter.get(), this.activeSecondary.get());
 		});
 
 		autorun(() => {
@@ -117,7 +120,7 @@ class MapStore {
 					this.activeSecondary.set(this.defaultTerrain.get());
 					break;
 				case 'dates':
-					this.activeSecondary.set(this.defaultDate.get());
+					this.activeSecondary.set('Potential');
 					break;
 				default:
 					this.addToMap();
@@ -141,21 +144,28 @@ class MapStore {
 
 	public addToMap = (key?: string, value?: string) => {
 		const filter: FilterFunction = (feature: IGeoJSONFeature) => {
-			if (!key) {
+			if (!key || key === 'gyms') {
 				return true;
 			}
 
-			if (value === 'All') {
-				return (
-					feature.properties[key] &&
-					feature.properties[key].length > 0
-				);
-			} else {
+			switch (value) {
+				case 'All':
+					return feature.properties[key].length > 0;
+				case 'Potential': {
+					const { terrains, dates } = feature.properties;
+
+					if (terrains.length < 1) {
+						return false;
+					}
+
 					return (
-					feature.properties[key] &&
-					feature.properties[key].indexOf(value) > -1
+						dates.length < 1 || // never had one before
+						dates[dates.length - 1] !== this.defaultDate.get() // the last
 					);
 				}
+				default:
+					return feature.properties[key].indexOf(value) > -1;
+			}
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};

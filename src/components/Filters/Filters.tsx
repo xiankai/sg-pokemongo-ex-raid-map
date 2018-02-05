@@ -46,7 +46,7 @@ class Filters extends React.Component<{}, {}> {
 							)}
 						>
 							{MapStore.activeFilter.get() !== 'dates' ||
-							secondaryFilter === 'All'
+							['All', 'Potential'].indexOf(secondaryFilter) > -1
 								? secondaryFilter
 								: moment(
 										secondaryFilter,
