@@ -43,6 +43,24 @@
 	overflow: auto;
 }
 
+.btn.park-filter {
+	background-color: rgb(30, 160, 30);
+}
+.btn.raid-filter {
+	background-color: rgb(30, 50, 60);
+}
+.btn.gym-filter {
+	background-color: rgb(30, 100, 190);
+}
+
+.btn.park-filter.active,
+.btn.raid-filter.active,
+.btn.raid-filter:hover,
+.btn.gym-filter.active,
+.btn.gym-filter:hover {
+	border-bottom: 10px solid white;
+}
+
 @media screen and (min-width: 600px) {
 	.secondary-filter {
 		width: calc(100% - 345px);

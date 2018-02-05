@@ -1,3 +1,4 @@
+import * as classnames from 'classnames';
 import { observer } from 'mobx-react';
 import * as moment from 'moment';
 import * as React from 'react';
@@ -17,11 +18,13 @@ class Filters extends React.Component<{}, {}> {
 					{MapStore.filters.map(filter => (
 						<div
 							key={filter.name}
-							className={
-								MapStore.active.get() === filter.name
-									? 'active btn'
-									: 'btn'
-							}
+							className={classnames({
+								btn: true,
+								active: MapStore.active.get() === filter.name,
+								'park-filter': filter.name === 'terrains',
+								'raid-filter': filter.name === 'dates',
+								'gym-filter': filter.name === 'gyms',
+							})}
 							onClick={this.handleFilterClick(filter.name)}
 						>
 							{filter.label}
