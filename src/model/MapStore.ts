@@ -24,6 +24,9 @@ export interface IS2CellCount {
 	};
 }
 
+const rawDateFormat = process.env.REACT_APP_RAW_DATE_FORMAT;
+const displayDateFormat = process.env.REACT_APP_DISPLAY_DATE_FORMAT;
+
 class MapStore {
 	public map: Map;
 	public layer: LayerGroup;
@@ -86,7 +89,6 @@ class MapStore {
 				)
 			);
 
-			const rawDateFormat = process.env.REACT_APP_RAW_DATE_FORMAT;
 			const dates = [].concat(
 				...this.gyms.map(feature => feature.properties.dates)
 			);
@@ -218,11 +220,9 @@ class MapStore {
 			dates.forEach((date: string) => {
 				exraidHTML =
 					'<li>' +
-					moment(
-						date,
-						process.env.REACT_APP_RAW_DATE_FORMAT,
-						true
-					).format(process.env.REACT_APP_DISPLAY_DATE_FORMAT) +
+					moment(date, rawDateFormat, true).format(
+						displayDateFormat
+					) +
 					'</li>' +
 					exraidHTML;
 			});
