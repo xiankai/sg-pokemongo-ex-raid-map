@@ -155,14 +155,15 @@ class MapStore {
 				case 'Potential': {
 					const { terrains, dates } = feature.properties;
 
-					if (terrains.length < 1) {
+					if (terrains.indexOf(this.defaultTerrain.get()) > -1) {
+						return true;
+					}
+
+					if (dates.length < 1) {
 						return false;
 					}
 
-					return (
-						dates.length < 1 || // never had one before
-						dates[dates.length - 1] !== this.defaultDate.get() // the last
-					);
+					return dates[dates.length - 1] !== this.defaultDate.get(); // the last
 				}
 				default:
 					return feature.properties[key].indexOf(value) > -1;
