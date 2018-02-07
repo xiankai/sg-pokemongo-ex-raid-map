@@ -56,10 +56,10 @@ class MapStore {
 		{ name: 'dates', label: 'EX-Raid Gyms' },
 	];
 	public activeFilter = computed(() => {
-		const activeFilter = this.filters.find(
+		const activeFilter = this.filters.filter(
 			f => f.name === this.active.get()
 		);
-		return activeFilter ? activeFilter.name : null;
+		return activeFilter.length > 0 ? activeFilter[0].name : null;
 	});
 
 	public activeSecondary = observable('Potential');
@@ -74,9 +74,12 @@ class MapStore {
 		}
 	});
 
-	public activeS2 = computed(() =>
-		this.s2Stores.find(store => this.map.hasLayer(store.layer))
-	);
+	public activeS2 = computed(() => {
+		const s2Store = this.s2Stores.filter(store =>
+			this.map.hasLayer(store.layer)
+		);
+		return s2Store.length > 0 ? s2Store[0] : null;
+	});
 
 	public totalCount = observable(0);
 

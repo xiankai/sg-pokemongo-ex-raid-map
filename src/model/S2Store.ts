@@ -23,7 +23,7 @@ class S2Store {
 	public cellLevel: number;
 	public cellReference: string;
 
-	public latLngs: IS2LatLng[];
+	public latLngs: IS2LatLng[] = [];
 	public polygonLayer: GeoJSON = geoJSON();
 	public layer: FeatureGroup = featureGroup([this.polygonLayer]);
 
