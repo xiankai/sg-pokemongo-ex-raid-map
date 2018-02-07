@@ -1,10 +1,12 @@
 import {
+	control,
 	geoJSON,
 	icon,
 	LayerGroup,
 	Map,
 	marker,
 	markerClusterGroup,
+	tileLayer,
 } from 'leaflet';
 import 'leaflet.markercluster';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -32,6 +34,8 @@ class MapStore {
 	public map: Map;
 	public layer: LayerGroup;
 	public markers: LayerGroup;
+	public s2Levels: number[] = [10, 12];
+	public s2Stores: S2Store[] = [];
 
 	public terrains = observable([]);
 	public defaultTerrain = computed(() => {
@@ -68,6 +72,10 @@ class MapStore {
 		}
 	});
 
+	public activeS2 = computed(() =>
+		this.s2Stores.find(store => this.map.hasLayer(store.layer))
+	);
+
 	constructor() {
 		if (!process.env.REACT_APP_GYM_URL) {
 			console.warn(
@@ -75,16 +83,12 @@ class MapStore {
 			);
 		}
 
-		async function init() {
+		const init = async () => {
 			const response = await fetch(process.env.REACT_APP_GYM_URL || '');
 
 			const data: IGeoJSON = await response.json();
 
-			return data.features;
-		}
-
-		init().then(features => {
-			this.gyms = features;
+			this.gyms = data.features;
 
 			const terrains = [].concat(
 				...this.gyms.map(feature => feature.properties.terrains)
@@ -112,6 +116,27 @@ class MapStore {
 
 			// Run once. Have to do this for "Potential"
 			this.addToMap(this.activeFilter.get(), this.activeSecondary.get());
+		};
+
+		init().then(() => {
+			control
+				.layers(
+					this.s2Levels.reduce(
+						(obj, cellLevel) => {
+							const s2Store = new S2Store({ cellLevel });
+
+							if (s2Store.valid) {
+								this.s2Stores.push(s2Store);
+								obj[`S2 L${cellLevel} grid`] = s2Store.layer;
+							}
+							return obj;
+						},
+						{
+							None: tileLayer(''),
+						}
+					)
+				)
+				.addTo(this.map);
 		});
 
 		autorun(() => {
@@ -171,19 +196,20 @@ class MapStore {
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};
-		const isS2Toggled = this.map.hasLayer(S2Store.s2LayerGroup);
-		if (isS2Toggled) {
-			onEachFeature = (feature: IGeoJSONFeature) => {
-				const total = feature.properties.dates.length;
-				const s2Cell = s2CellCount[feature.properties.s2Cell];
 
+		if (this.activeS2.get()) {
+			onEachFeature = (feature: IGeoJSONFeature) => {
+				const s2CellLabel =
+					feature.properties[this.activeS2.get().cellReference];
+				const s2Cell = s2CellCount[s2CellLabel];
+				const total = feature.properties.dates.length;
 				if (s2Cell) {
-					s2CellCount[feature.properties.s2Cell] = {
+					s2CellCount[s2CellLabel] = {
 						count: s2Cell.count + 1,
 						total: s2Cell.total + total,
 					};
 				} else {
-					s2CellCount[feature.properties.s2Cell] = {
+					s2CellCount[s2CellLabel] = {
 						count: 1,
 						total,
 					};
@@ -201,7 +227,7 @@ class MapStore {
 			onEachFeature,
 			pointToLayer: (geoJsonPoint, latLng) => {
 				const markerOptions: any = {
-					opacity: isS2Toggled ? 0.7 : 1,
+					opacity: this.activeS2 ? 0.7 : 1,
 				};
 
 				const { terrains, dates } = geoJsonPoint.properties;
@@ -236,8 +262,8 @@ class MapStore {
 			},
 		});
 
-		if (isS2Toggled) {
-			S2Store.overlayS2Labels(s2CellCount);
+		if (this.activeS2.get()) {
+			this.activeS2.get().overlayS2Labels(s2CellCount);
 		}
 
 		this.markers.clearLayers();
@@ -271,12 +297,18 @@ class MapStore {
 			exraidHTML += '<div>No EX-raid yet</div>';
 		}
 
+		if (this.activeS2.get()) {
+			const cellLevel = this.activeS2.get().cellLevel;
+			exraidHTML += `<div>S2 L${cellLevel} Cell: ${
+				feature.properties[`S2L${cellLevel}`]
+			}</div>`;
+		}
+
 		return `
 			<strong>
 				${feature.properties.name}
 			</strong>
 			${exraidHTML}
-			<div>S2 Cell: ${feature.properties.s2Cell}</div>
 			<br/>
 			<div>
 				<a target="_blank" href="

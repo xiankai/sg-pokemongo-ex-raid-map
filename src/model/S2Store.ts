@@ -1,138 +1,132 @@
-import { control, divIcon, featureGroup, geoJSON, marker } from 'leaflet';
-import { IS2GeoJSON, IS2GeoJSONFeature } from '../@types/geojson';
-import MapStore, { IS2CellCount } from './MapStore';
+import {
+	divIcon,
+	featureGroup,
+	FeatureGroup,
+	geoJSON,
+	GeoJSON,
+	marker,
+} from 'leaflet';
+import { IS2GeoJSONFeature } from '../@types/geojson';
+import { IS2CellCount } from './MapStore';
 
 interface IS2LatLng {
 	topleft: number[];
 	topright: number[];
 	bottomright: number[];
 	bottomleft: number[];
-	s2Cell: string;
+	reference: string;
 }
 
 class S2Store {
-	public s2LatLngs: IS2LatLng[];
-	public s2LocationCountLayer: any;
-	public s2TotaRaidsLayer: any;
-	public s2PolygonLayer: any;
-	public s2LayerGroup: any;
-	public s2CountsLayerGroup: any;
-	public s2TotalsLayerGroup: any;
+	public url: string = '';
+	public valid: boolean = true;
+	public cellLevel: number;
+	public cellReference: string;
 
-	constructor() {
-		if (!process.env.REACT_APP_S2_L12_URL) {
+	public latLngs: IS2LatLng[];
+	public polygonLayer: GeoJSON = geoJSON();
+	public layer: FeatureGroup = featureGroup([this.polygonLayer]);
+
+	constructor({ cellLevel }: { cellLevel: number }) {
+		this.cellLevel = cellLevel;
+		this.cellReference = `S2L${cellLevel}`;
+		this.url = process.env[`REACT_APP_S2_L${cellLevel}_URL`];
+
+		if (!this.url) {
 			console.warn(
-				'REACT_APP_S2_L12_URL not defined. S2 grid will not be available.'
+				`${
+					this.url
+				} not defined. S2 L${cellLevel} grid will not be available.`
 			);
+
+			this.valid = false;
+
+			return null;
 		}
 
-		this.s2LocationCountLayer = featureGroup();
-		this.s2TotaRaidsLayer = featureGroup();
-		this.s2PolygonLayer = geoJSON();
-		this.s2LayerGroup = featureGroup([this.s2PolygonLayer]);
-		this.s2CountsLayerGroup = featureGroup();
-		this.s2TotalsLayerGroup = featureGroup();
+		const init = async () => {
+			const response = await fetch(this.url);
 
-		async function init() {
-			const response = await fetch(
-				process.env.REACT_APP_S2_L12_URL || ''
-			);
+			const data = await response.json();
 
-			const data: IS2GeoJSON = await response.json();
+			this.latLngs = data.features.map((feature: IS2GeoJSONFeature) => ({
+				reference: feature.properties.order,
+				bottomleft: [
+					feature.coordinates[0][0][1],
+					feature.coordinates[0][0][0],
+				],
+				bottomright: [
+					feature.coordinates[0][1][1],
+					feature.coordinates[0][1][0],
+				],
+				topleft: [
+					feature.coordinates[0][3][1],
+					feature.coordinates[0][3][0],
+				],
+				topright: [
+					feature.coordinates[0][2][1],
+					feature.coordinates[0][2][0],
+				],
+			}));
+			this.polygonLayer.addData(data);
+		};
 
-			return data;
-		}
-
-		init().then(data => {
-			this.s2LatLngs = data.features.map(
-				(feature: IS2GeoJSONFeature) => ({
-					bottomleft: [
-						feature.coordinates[0][0][1],
-						feature.coordinates[0][0][0],
-					],
-					bottomright: [
-						feature.coordinates[0][1][1],
-						feature.coordinates[0][1][0],
-					],
-					s2Cell: feature.properties.order,
-					topleft: [
-						feature.coordinates[0][3][1],
-						feature.coordinates[0][3][0],
-					],
-					topright: [
-						feature.coordinates[0][2][1],
-						feature.coordinates[0][2][0],
-					],
-				})
-			);
-			this.s2PolygonLayer.addData(data);
-
-			control
-				.layers(null, {
-					'S2 cells L12 grid': this.s2LayerGroup,
-					'Locations per cell (red)': this.s2CountsLayerGroup,
-					'Total raids per cell (blue)': this.s2TotalsLayerGroup,
-				})
-				.addTo(MapStore.map);
-		});
+		init();
 	}
 
 	public overlayS2Labels = (s2CellCount: IS2CellCount) => {
+		this.layer.clearLayers();
+		this.layer.addLayer(this.polygonLayer);
+
 		const s2Cells = featureGroup(
-			this.s2LatLngs.map(({ s2Cell, topleft }) =>
+			this.latLngs.map(({ reference, topleft }) =>
 				marker(
 					{ lat: topleft[0], lng: topleft[1] },
 					{
 						icon: divIcon({
 							className: 's2-label',
-							html: s2CellCount[s2Cell] ? s2Cell : '',
+							html: s2CellCount[reference] ? reference : '',
 						}),
 					}
 				)
 			)
 		);
+		this.layer.addLayer(s2Cells);
 
 		const counts = featureGroup(
-			this.s2LatLngs.map(({ s2Cell, topright }) =>
+			this.latLngs.map(({ reference, topright }) =>
 				marker(
 					{ lat: topright[0], lng: topright[1] },
 					{
 						icon: divIcon({
 							className: 's2-label s2-count',
-							html: s2CellCount[s2Cell]
-								? String(s2CellCount[s2Cell].count)
+							html: s2CellCount[reference]
+								? String(s2CellCount[reference].count)
 								: '',
 						}),
 					}
 				)
 			)
 		);
+		this.layer.addLayer(counts);
 
-		const totals = featureGroup(
-			this.s2LatLngs.map(({ s2Cell, bottomleft }) =>
-				marker(
-					{ lat: bottomleft[0], lng: bottomleft[1] },
-					{
-						icon: divIcon({
-							className: 's2-label s2-total',
-							html: s2CellCount[s2Cell]
-								? String(s2CellCount[s2Cell].total)
-								: '',
-						}),
-					}
-				)
-			)
-		);
-
-		this.s2LayerGroup.clearLayers();
-		this.s2CountsLayerGroup.clearLayers();
-		this.s2TotalsLayerGroup.clearLayers();
-		this.s2LayerGroup.addLayer(this.s2PolygonLayer);
-		this.s2LayerGroup.addLayer(s2Cells);
-		this.s2CountsLayerGroup.addLayer(counts);
-		this.s2TotalsLayerGroup.addLayer(totals);
+		// const totals = featureGroup(
+		// 	this.latLngs.map(({ reference, bottomleft }) =>
+		// 		marker(
+		// 			{ lat: bottomleft[0], lng: bottomleft[1] },
+		// 			{
+		// 				icon: divIcon({
+		// 					className: 's2-label s2-total',
+		// 					html: s2CellCount[reference]
+		// 						? String(s2CellCount[reference].total)
+		// 						: '',
+		// 				}),
+		// 			}
+		// 		)
+		// 	)
+		// );
+		// this.layer.addLayer(totals);
 	};
 }
 
-const singleton = new S2Store();
-export default singleton;
+export default S2Store;

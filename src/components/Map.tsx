@@ -42,7 +42,7 @@ export default class Map extends React.Component<
 			center: [1.358, 103.833],
 			minZoom: 10,
 			zoom: 12,
-		}).on('overlayadd', () => {
+		}).on('baselayerchange', () => {
 			MapStore.addToMap(
 				MapStore.activeFilter.get(),
 				MapStore.activeSecondary.get()
