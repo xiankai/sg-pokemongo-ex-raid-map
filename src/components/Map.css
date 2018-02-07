@@ -8,5 +8,12 @@
 
 .leaflet-control.leaflet-control-layers,
 .leaflet-control.leaflet-control-zoom {
-	margin-top: 6em;
+	margin-top: 8em;
+}
+
+@media screen and (min-width: 600px) {
+	.leaflet-control.leaflet-control-layers,
+	.leaflet-control.leaflet-control-zoom {
+		margin-top: 4em;
+	}
 }

@@ -76,7 +76,7 @@ class MapStore {
 		this.s2Stores.find(store => this.map.hasLayer(store.layer))
 	);
 
-	public totalCount: number = 0;
+	public totalCount = observable(0);
 
 	constructor() {
 		if (!process.env.REACT_APP_GYM_URL) {
@@ -165,13 +165,13 @@ class MapStore {
 
 		this.markers = markerClusterGroup({
 			disableClusteringAtZoom: 15,
-			maxClusterRadius: () => (this.totalCount > 100 ? 80 : 0),
+			maxClusterRadius: () => (this.totalCount.get() > 100 ? 80 : 0),
 			spiderfyOnMaxZoom: false,
 		});
 	}
 
 	public addToMap = (key?: string, value?: string) => {
-		this.totalCount = 0;
+		this.totalCount.set(0);
 		const filter: FilterFunction = (feature: IGeoJSONFeature) => {
 			const flagFn = () => {
 				if (!key || key === 'gyms') {
@@ -201,7 +201,11 @@ class MapStore {
 				}
 			};
 
-			return flagFn() && ++this.totalCount;
+			if (flagFn()) {
+				this.totalCount.set(this.totalCount.get() + 1);
+				return true;
+			}
+			return false;
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};

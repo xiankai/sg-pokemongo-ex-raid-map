@@ -59,6 +59,9 @@ class Filters extends React.Component<{}, {}> {
 						</div>
 					))}
 				</div>
+				<div className="btn-group btn total-count">
+					Total: {MapStore.totalCount.get()}
+				</div>
 			</>
 		);
 	}
