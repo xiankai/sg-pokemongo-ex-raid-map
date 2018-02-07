@@ -85,7 +85,11 @@ class S2Store {
 					{
 						icon: divIcon({
 							className: 's2-label',
-							html: s2CellCount[reference] ? reference : '',
+							html: s2CellCount[reference]
+								? `${reference} <span class="s2-label s2-count">(${
+										s2CellCount[reference].count
+									})</span>`
+								: '',
 						}),
 					}
 				)
@@ -93,22 +97,22 @@ class S2Store {
 		);
 		this.layer.addLayer(s2Cells);
 
-		const counts = featureGroup(
-			this.latLngs.map(({ reference, topright }) =>
-				marker(
-					{ lat: topright[0], lng: topright[1] },
-					{
-						icon: divIcon({
-							className: 's2-label s2-count',
-							html: s2CellCount[reference]
-								? String(s2CellCount[reference].count)
-								: '',
-						}),
-					}
-				)
-			)
-		);
-		this.layer.addLayer(counts);
+		// const counts = featureGroup(
+		// 	this.latLngs.map(({ reference, topright }) =>
+		// 		marker(
+		// 			{ lat: topright[0], lng: topright[1] },
+		// 			{
+		// 				icon: divIcon({
+		// 					className: 's2-label s2-count',
+		// 					html: s2CellCount[reference]
+		// 						? String(s2CellCount[reference].count)
+		// 						: '',
+		// 				}),
+		// 			}
+		// 		)
+		// 	)
+		// );
+		// this.layer.addLayer(counts);
 
 		// const totals = featureGroup(
 		// 	this.latLngs.map(({ reference, bottomleft }) =>
