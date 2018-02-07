@@ -76,6 +76,8 @@ class MapStore {
 		this.s2Stores.find(store => this.map.hasLayer(store.layer))
 	);
 
+	public totalCount: number = 0;
+
 	constructor() {
 		if (!process.env.REACT_APP_GYM_URL) {
 			console.warn(
@@ -163,36 +165,43 @@ class MapStore {
 
 		this.markers = markerClusterGroup({
 			disableClusteringAtZoom: 14,
-			maxClusterRadius: () => (this.active.get() === 'dates' ? 0 : 80),
+			maxClusterRadius: () => (this.totalCount > 100 ? 80 : 0),
 			spiderfyOnMaxZoom: false,
 		});
 	}
 
 	public addToMap = (key?: string, value?: string) => {
+		this.totalCount = 0;
 		const filter: FilterFunction = (feature: IGeoJSONFeature) => {
-			if (!key || key === 'gyms') {
-				return true;
-			}
-
-			switch (value) {
-				case 'All':
-					return feature.properties[key].length > 0;
-				case 'Potential': {
-					const { terrains, dates } = feature.properties;
-
-					if (terrains.indexOf(this.defaultTerrain.get()) > -1) {
-						return true;
-					}
-
-					if (dates.length < 1) {
-						return false;
-					}
-
-					return dates[dates.length - 1] !== this.defaultDate.get(); // the last
+			const flagFn = () => {
+				if (!key || key === 'gyms') {
+					return true;
 				}
-				default:
-					return feature.properties[key].indexOf(value) > -1;
-			}
+
+				switch (value) {
+					case 'All':
+						return feature.properties[key].length > 0;
+					case 'Potential': {
+						const { terrains, dates } = feature.properties;
+
+						if (terrains.indexOf(this.defaultTerrain.get()) > -1) {
+							return true;
+						}
+
+						if (dates.length < 1) {
+							return false;
+						}
+
+						return (
+							dates[dates.length - 1] !== this.defaultDate.get()
+						); // the last
+					}
+					default:
+						return feature.properties[key].indexOf(value) > -1;
+				}
+			};
+
+			return flagFn() && this.totalCount++;
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};
