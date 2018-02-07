@@ -7,6 +7,7 @@ import {
 	marker,
 	markerClusterGroup,
 	tileLayer,
+	TileLayer,
 } from 'leaflet';
 import 'leaflet.markercluster';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -33,6 +34,7 @@ const displayDateFormat = process.env.REACT_APP_DISPLAY_DATE_FORMAT;
 class MapStore {
 	public map: Map;
 	public layer: LayerGroup;
+	public defaultLayer: TileLayer = tileLayer('');
 	public markers: LayerGroup;
 	public s2Levels: number[] = [10, 12];
 	public s2Stores: S2Store[] = [];
@@ -134,11 +136,14 @@ class MapStore {
 							return obj;
 						},
 						{
-							None: tileLayer(''),
+							None: this.defaultLayer,
 						}
 					)
 				)
 				.addTo(this.map);
+
+			this.map.addLayer(this.defaultLayer);
+			this.map.addLayer(this.markers);
 		});
 
 		reaction(
@@ -245,9 +250,7 @@ class MapStore {
 				filter,
 				onEachFeature,
 				pointToLayer: (geoJsonPoint, latLng) => {
-					const markerOptions: any = {
-						opacity: this.activeS2 ? 0.7 : 1,
-					};
+					const markerOptions: any = {};
 
 					const { terrains, dates } = geoJsonPoint.properties;
 
@@ -291,8 +294,6 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-
-			this.map.addLayer(this.markers);
 		});
 
 	public renderPopup = (layer: any) => {
