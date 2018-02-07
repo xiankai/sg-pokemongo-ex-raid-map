@@ -10,7 +10,7 @@ import {
 } from 'leaflet';
 import 'leaflet.markercluster';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-import { autorun, computed, observable, reaction } from 'mobx';
+import { computed, observable, reaction, transaction } from 'mobx';
 import * as moment from 'moment';
 import {
 	FilterFunction,
@@ -141,19 +141,21 @@ class MapStore {
 				.addTo(this.map);
 		});
 
-		autorun(() => {
-			const key = this.activeFilter.get();
-			switch (key) {
-				case 'terrains':
-					this.activeSecondary.set(this.defaultTerrain.get());
-					break;
-				case 'dates':
-					this.activeSecondary.set('Potential');
-					break;
-				default:
-					this.addToMap();
+		reaction(
+			() => this.activeFilter.get(),
+			key => {
+				switch (key) {
+					case 'terrains':
+						this.activeSecondary.set(this.defaultTerrain.get());
+						break;
+					case 'dates':
+						this.activeSecondary.set('Potential');
+						break;
+					default:
+						this.addToMap();
+				}
 			}
-		});
+		);
 
 		reaction(
 			() => ({
@@ -170,122 +172,128 @@ class MapStore {
 		});
 	}
 
-	public addToMap = (key?: string, value?: string) => {
-		this.totalCount.set(0);
-		const filter: FilterFunction = (feature: IGeoJSONFeature) => {
-			const flagFn = () => {
-				if (!key || key === 'gyms') {
-					return true;
-				}
-
-				switch (value) {
-					case 'All':
-						return feature.properties[key].length > 0;
-					case 'Potential': {
-						const { terrains, dates } = feature.properties;
-
-						if (terrains.indexOf(this.defaultTerrain.get()) > -1) {
-							return true;
-						}
-
-						if (dates.length < 1) {
-							return false;
-						}
-
-						return (
-							dates[dates.length - 1] !== this.defaultDate.get()
-						); // the last
+	public addToMap = (key?: string, value?: string) =>
+		transaction(() => {
+			this.totalCount.set(0);
+			const filter: FilterFunction = (feature: IGeoJSONFeature) => {
+				const flagFn = () => {
+					if (!key || key === 'gyms') {
+						return true;
 					}
-					default:
-						return feature.properties[key].indexOf(value) > -1;
-				}
-			};
 
-			if (flagFn()) {
-				this.totalCount.set(this.totalCount.get() + 1);
-				return true;
-			}
-			return false;
-		};
-		const s2CellCount: IS2CellCount = {};
-		let onEachFeature: LoopFunction = () => {};
+					switch (value) {
+						case 'All':
+							return feature.properties[key].length > 0;
+						case 'Potential': {
+							const { terrains, dates } = feature.properties;
 
-		if (this.activeS2.get()) {
-			onEachFeature = (feature: IGeoJSONFeature) => {
-				const s2CellLabel =
-					feature.properties[this.activeS2.get().cellReference];
-				const s2Cell = s2CellCount[s2CellLabel];
-				const total = feature.properties.dates.length;
-				if (s2Cell) {
-					s2CellCount[s2CellLabel] = {
-						count: s2Cell.count + 1,
-						total: s2Cell.total + total,
-					};
-				} else {
-					s2CellCount[s2CellLabel] = {
-						count: 1,
-						total,
-					};
-				}
-			};
-		}
+							if (
+								terrains.indexOf(this.defaultTerrain.get()) > -1
+							) {
+								return true;
+							}
 
-		const FeatureCollection: any = {
-			features: this.gyms.slice(),
-			type: 'FeatureCollection',
-		};
+							if (dates.length < 1) {
+								return false;
+							}
 
-		this.layer = geoJSON(FeatureCollection, {
-			filter,
-			onEachFeature,
-			pointToLayer: (geoJsonPoint, latLng) => {
-				const markerOptions: any = {
-					opacity: this.activeS2 ? 0.7 : 1,
+							return (
+								dates[dates.length - 1] !==
+								this.defaultDate.get()
+							); // the last
+						}
+						default:
+							return feature.properties[key].indexOf(value) > -1;
+					}
 				};
 
-				const { terrains, dates } = geoJsonPoint.properties;
-
-				let customMarker = '';
-				if (terrains.length > 0) {
-					customMarker = 'green';
+				if (flagFn()) {
+					this.totalCount.set(this.totalCount.get() + 1);
+					return true;
 				}
+				return false;
+			};
+			const s2CellCount: IS2CellCount = {};
+			let onEachFeature: LoopFunction = () => {};
 
-				if (dates.length > 0) {
-					customMarker = 'black';
-				}
+			if (this.activeS2.get()) {
+				onEachFeature = (feature: IGeoJSONFeature) => {
+					const s2CellLabel =
+						feature.properties[this.activeS2.get().cellReference];
+					const s2Cell = s2CellCount[s2CellLabel];
+					const total = feature.properties.dates.length;
+					if (s2Cell) {
+						s2CellCount[s2CellLabel] = {
+							count: s2Cell.count + 1,
+							total: s2Cell.total + total,
+						};
+					} else {
+						s2CellCount[s2CellLabel] = {
+							count: 1,
+							total,
+						};
+					}
+				};
+			}
 
-				// Take away 2 for the EX-raid tests
-				// Divide by 2 for raids that occur almost every 2 weeks
-				if (dates.length >= Math.floor((this.dates.length - 2) / 2)) {
-					customMarker = 'red';
-				}
+			const FeatureCollection: any = {
+				features: this.gyms.slice(),
+				type: 'FeatureCollection',
+			};
 
-				if (customMarker) {
-					markerOptions.icon = icon({
-						iconAnchor: [12, 41],
-						iconUrl: `${
-							process.env.PUBLIC_URL
-						}/markers/${customMarker}.png`,
-						shadowUrl,
-						popupAnchor: [0, -32],
-					});
-				}
+			this.layer = geoJSON(FeatureCollection, {
+				filter,
+				onEachFeature,
+				pointToLayer: (geoJsonPoint, latLng) => {
+					const markerOptions: any = {
+						opacity: this.activeS2 ? 0.7 : 1,
+					};
 
-				return marker(latLng, markerOptions);
-			},
+					const { terrains, dates } = geoJsonPoint.properties;
+
+					let customMarker = '';
+					if (terrains.length > 0) {
+						customMarker = 'green';
+					}
+
+					if (dates.length > 0) {
+						customMarker = 'black';
+					}
+
+					// Take away 2 for the EX-raid tests
+					// Divide by 2 for raids that occur almost every 2 weeks
+					if (
+						dates.length >= Math.floor((this.dates.length - 2) / 2)
+					) {
+						customMarker = 'red';
+					}
+
+					if (customMarker) {
+						markerOptions.icon = icon({
+							iconAnchor: [12, 41],
+							iconUrl: `${
+								process.env.PUBLIC_URL
+							}/markers/${customMarker}.png`,
+							shadowUrl,
+							popupAnchor: [0, -32],
+						});
+					}
+
+					return marker(latLng, markerOptions);
+				},
+			});
+
+			if (this.activeS2.get()) {
+				this.activeS2.get().overlayS2Labels(s2CellCount);
+			}
+
+			this.markers.clearLayers();
+			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
+				autoPanPaddingTopLeft: [100, 100],
+			});
+
+			this.map.addLayer(this.markers);
 		});
-
-		if (this.activeS2.get()) {
-			this.activeS2.get().overlayS2Labels(s2CellCount);
-		}
-
-		this.markers.clearLayers();
-		this.markers
-			.addLayer(this.layer)
-			.bindPopup(this.renderPopup, { autoPanPaddingTopLeft: [100, 100] });
-
-		this.map.addLayer(this.markers);
-	};
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
