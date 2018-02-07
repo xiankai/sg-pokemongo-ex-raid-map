@@ -130,7 +130,7 @@ class S2Store {
 		// 	)
 		// );
 		// this.layer.addLayer(totals);
-	};
+	}
 }
 
 export default S2Store;
