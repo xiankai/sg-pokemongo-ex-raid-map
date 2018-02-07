@@ -201,7 +201,7 @@ class MapStore {
 				}
 			};
 
-			return flagFn() && this.totalCount++;
+			return flagFn() && ++this.totalCount;
 		};
 		const s2CellCount: IS2CellCount = {};
 		let onEachFeature: LoopFunction = () => {};
