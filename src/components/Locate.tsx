@@ -15,7 +15,7 @@ class Locate extends React.Component<{}, {}> {
 			initial: false,
 			layer: MapStore.layer,
 			propertyName: 'name',
-			zoom: 14,
+			zoom: 15,
 			// moveToLocation: (latlng, title, map) => {
 			//   map.panTo(latlng);
 			//   markers.openPopup(L.latLng(latlng.lat, latlng.lng));
