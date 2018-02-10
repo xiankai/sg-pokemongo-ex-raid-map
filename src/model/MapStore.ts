@@ -213,8 +213,8 @@ class MapStore {
 								return true;
 							}
 
-								return false;
-							}
+							return false;
+						}
 						default:
 							return feature.properties[key].indexOf(value) > -1;
 					}
@@ -312,15 +312,20 @@ class MapStore {
 
 		let exraidHTML = '';
 		if (dates && dates.length > 0) {
-			dates.forEach((date: string) => {
-				exraidHTML =
-					'<li>' +
-					moment(date, rawDateFormat, true).format(
-						displayDateFormat
-					) +
-					'</li>' +
-					exraidHTML;
-			});
+			dates
+				.sort(
+					(a: string, b: string) =>
+						moment(b, rawDateFormat, true).unix() -
+						moment(a, rawDateFormat, true).unix()
+				)
+				.forEach((date: string) => {
+					exraidHTML +=
+						'<li>' +
+						moment(date, rawDateFormat, true).format(
+							displayDateFormat
+						) +
+						'</li>';
+				});
 			exraidHTML = '<div>EX-dates:<ul>' + exraidHTML;
 			exraidHTML += '</ul></div>';
 		} else {
@@ -352,7 +357,7 @@ class MapStore {
 				">SGPokemap</a>
 			</div>
 		`;
-	}
+	};
 }
 
 const singleton = new MapStore();
