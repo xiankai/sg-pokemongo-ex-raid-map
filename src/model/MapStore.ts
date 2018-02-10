@@ -195,21 +195,26 @@ class MapStore {
 						case 'Potential': {
 							const { terrains, dates } = feature.properties;
 
+							const latestDate = moment
+								.max(
+									...dates.map(date =>
+										moment(date, rawDateFormat, true)
+									)
+								)
+								.format(rawDateFormat);
+
+							if (latestDate === this.defaultDate.get()) {
+								return false;
+							}
+
 							if (
 								terrains.indexOf(this.defaultTerrain.get()) > -1
 							) {
 								return true;
 							}
 
-							if (dates.length < 1) {
 								return false;
 							}
-
-							return (
-								dates[dates.length - 1] !==
-								this.defaultDate.get()
-							); // the last
-						}
 						default:
 							return feature.properties[key].indexOf(value) > -1;
 					}
@@ -297,7 +302,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		})
+		});
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
