@@ -36,7 +36,7 @@ class MapStore {
 	public layer: LayerGroup;
 	public defaultLayer: TileLayer = tileLayer('');
 	public markers: LayerGroup;
-	public s2Levels: number[] = [10, 12];
+	public s2Levels: number[] = [10, 12, 13];
 	public s2Stores: S2Store[] = [];
 
 	public terrains = observable([]);
