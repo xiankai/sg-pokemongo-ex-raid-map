@@ -175,7 +175,7 @@ class MapStore {
 
 		this.markers = markerClusterGroup({
 			disableClusteringAtZoom: 15,
-			maxClusterRadius: () => (this.totalCount.get() > 100 ? 80 : 0),
+			maxClusterRadius: () => (this.totalCount.get() > 200 ? 80 : 0),
 			spiderfyOnMaxZoom: false,
 		});
 	}
