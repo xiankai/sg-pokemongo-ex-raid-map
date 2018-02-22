@@ -30,7 +30,10 @@ class S2Store {
 	constructor({ cellLevel }: { cellLevel: number }) {
 		this.cellLevel = cellLevel;
 		this.cellReference = `S2L${cellLevel}`;
-		this.url = process.env[`REACT_APP_S2_L${cellLevel}_URL`];
+		this.url = process.env.REACT_APP_S2_URL.replace(
+			'{c}',
+			String(cellLevel)
+		);
 
 		if (!this.url) {
 			console.warn(
