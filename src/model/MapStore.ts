@@ -346,6 +346,20 @@ class MapStore {
 			}</div>`;
 		}
 
+		const label = process.env.REACT_APP_MAP_LINK_LABEL;
+		const url = (process.env.REACT_APP_MAP_LINK_URL || '')
+			.replace('{lng}', lngLat[1])
+			.replace('{lat}', lngLat[0]);
+
+		let extraLink = '';
+		if (label && url) {
+			extraLink = `
+				<div>
+					<a target="_blank" href="${url}">${label}</a>
+				</div>
+			`;
+		}
+
 		return `
 			<strong>
 				${feature.properties.name}
@@ -358,11 +372,7 @@ class MapStore {
 				">Google Maps</a>
 			</div>
 			<br/>
-			<div>
-				<a target="_blank" href="
-				https://sgpokemap.com/gym.html#${lngLat[1]},${lngLat[0]}
-				">SGPokemap</a>
-			</div>
+			${extraLink}
 		`;
 	};
 }
