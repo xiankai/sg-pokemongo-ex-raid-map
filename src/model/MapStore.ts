@@ -36,7 +36,10 @@ class MapStore {
 	public layer: LayerGroup;
 	public defaultLayer: TileLayer = tileLayer('');
 	public markers: LayerGroup;
-	public s2Levels: number[] = [10, 12, 13];
+	public s2Levels: number[] = (process.env.REACT_APP_S2_LEVELS || '')
+		.split(',')
+		.filter(Boolean)
+		.map(Number);
 	public s2Stores: S2Store[] = [];
 
 	public terrains = observable([]);
@@ -126,24 +129,27 @@ class MapStore {
 		};
 
 		init().then(() => {
-			control
-				.layers(
-					this.s2Levels.reduce(
-						(obj, cellLevel) => {
-							const s2Store = new S2Store({ cellLevel });
+			if (this.s2Levels.length > 0) {
+				control
+					.layers(
+						this.s2Levels.reduce(
+							(obj, cellLevel) => {
+								const s2Store = new S2Store({ cellLevel });
 
-							if (s2Store.valid) {
-								this.s2Stores.push(s2Store);
-								obj[`S2 L${cellLevel} grid`] = s2Store.layer;
+								if (s2Store.valid) {
+									this.s2Stores.push(s2Store);
+									obj[`S2 L${cellLevel} grid`] =
+										s2Store.layer;
+								}
+								return obj;
+							},
+							{
+								None: this.defaultLayer,
 							}
-							return obj;
-						},
-						{
-							None: this.defaultLayer,
-						}
+						)
 					)
-				)
-				.addTo(this.map);
+					.addTo(this.map);
+			}
 
 			this.map.addLayer(this.defaultLayer);
 			this.map.addLayer(this.markers);
