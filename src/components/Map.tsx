@@ -38,10 +38,15 @@ export default class Map extends React.Component<
 	};
 
 	public componentDidMount() {
+		const center = process.env.REACT_APP_DEFAULT_CENTER.split(',').map(
+			Number
+		);
+		const minZoom = +process.env.REACT_APP_MIN_ZOOM;
+		const zoom = +process.env.REACT_APP_DEFAULT_ZOOM;
 		MapStore.map = L.map(this.refs.map, {
-			center: [1.358, 103.833],
-			minZoom: 10,
-			zoom: 12,
+			center: [center[0], center[1]],
+			minZoom,
+			zoom,
 		}).on('baselayerchange', () => {
 			MapStore.addToMap(
 				MapStore.activeFilter.get(),
