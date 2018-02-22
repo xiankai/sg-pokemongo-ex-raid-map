@@ -271,11 +271,18 @@ class MapStore {
 						customMarker = 'black';
 					}
 
-					// Take away 2 for the EX-raid tests
-					// Divide by 2 for raids that occur almost every 2 weeks
-					if (
-						dates.length >= Math.floor((this.dates.length - 2) / 2)
-					) {
+					// Take away any dates to exclude
+					// like the EX-raid tests, the SL10 bugged release and SL13 one-trick-pony
+					// Divide by 2 for raids that occur almost every 2 weeks.
+					const eligibleDates = this.dates.filter(
+						date =>
+							(process.env.REACT_APP_DATES_TO_EXCLUDE || '')
+								.split(',')
+								.filter(Boolean)
+								.indexOf(date) < 0
+					);
+
+					if (dates.length >= Math.floor(eligibleDates.length / 2)) {
 						customMarker = 'red';
 					}
 
