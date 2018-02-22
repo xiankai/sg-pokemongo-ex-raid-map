@@ -67,8 +67,9 @@ export default class Map extends React.Component<
 		}
 
 		L.tileLayer(process.env.REACT_APP_TILE_SERVER || '', {
-			attribution:
-				'&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | <a href="https://goo.gl/forms/jVQOTAdsE9KdGIe52" target="_blank">Missing raid location?</a>',
+			attribution: `&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors | ${
+				process.env.REACT_APP_MAP_ATTRIBUTION
+			}`,
 		}).addTo(MapStore.map);
 	};
 
