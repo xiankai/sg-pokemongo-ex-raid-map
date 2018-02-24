@@ -30,6 +30,7 @@ export interface IS2CellCount {
 
 const rawDateFormat = process.env.REACT_APP_RAW_DATE_FORMAT;
 const displayDateFormat = process.env.REACT_APP_DISPLAY_DATE_FORMAT;
+const displayTimeFormat = process.env.REACT_APP_DISPLAY_TIME_FORMAT;
 
 class MapStore {
 	public map: Map;
@@ -332,12 +333,17 @@ class MapStore {
 						moment(a, rawDateFormat, true).unix()
 				)
 				.forEach((date: string) => {
-					exraidHTML +=
-						'<li>' +
-						moment(date, rawDateFormat, true).format(
-							displayDateFormat
-						) +
-						'</li>';
+					const datetime = moment(date, rawDateFormat, true);
+					const hasTime = displayTimeFormat && datetime.hour() > 0;
+					exraidHTML += `<li>
+						${datetime.format(displayDateFormat)}
+						${
+							hasTime
+								? ` ${datetime.format(displayTimeFormat)} - 
+							${datetime.add(45, 'minutes').format(displayTimeFormat)}`
+								: ''
+						}
+						</li>`;
 				});
 			exraidHTML = '<div>EX-dates:<ul>' + exraidHTML;
 			exraidHTML += '</ul></div>';
