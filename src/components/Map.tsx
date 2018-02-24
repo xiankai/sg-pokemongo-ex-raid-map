@@ -11,6 +11,7 @@ import MapStore from '../model/MapStore';
 import Controls from './Controls';
 import Filters from './Filters/Filters';
 import './Map.css';
+import './Popup.css';
 import './S2.css';
 
 // https://github.com/PaulLeCam/react-leaflet/issues/255#issuecomment-269750542
@@ -71,7 +72,7 @@ export default class Map extends React.Component<
 				process.env.REACT_APP_MAP_ATTRIBUTION
 			}`,
 		}).addTo(MapStore.map);
-	};
+	}
 
 	public render() {
 		return (

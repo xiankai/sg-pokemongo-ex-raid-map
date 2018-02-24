@@ -316,7 +316,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		});
+		})
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
@@ -336,16 +336,17 @@ class MapStore {
 					const datetime = moment(date, rawDateFormat, true);
 					const hasTime = displayTimeFormat && datetime.hour() > 0;
 					exraidHTML += `<li>
-						${datetime.format(displayDateFormat)}
-						${
+						<span>${datetime.format(displayDateFormat)}</span>
+						<span style="width: 20px;"></span>
+						<span>${
 							hasTime
 								? ` ${datetime.format(displayTimeFormat)} - 
 							${datetime.add(45, 'minutes').format(displayTimeFormat)}`
 								: ''
-						}
+						}</span>
 						</li>`;
 				});
-			exraidHTML = '<div>EX-dates:<ul>' + exraidHTML;
+			exraidHTML = '<div>EX-raid(s):<ul>' + exraidHTML;
 			exraidHTML += '</ul></div>';
 		} else {
 			exraidHTML += '<div>No EX-raid yet</div>';
@@ -386,7 +387,7 @@ class MapStore {
 			<br/>
 			${extraLink}
 		`;
-	};
+	}
 }
 
 const singleton = new MapStore();

@@ -7,9 +7,9 @@ import './Filters.css';
 
 class Filters extends React.Component<{}, {}> {
 	public handleFilterClick = (name: string) => () =>
-		MapStore.active.set(name);
+		MapStore.active.set(name)
 	public handleSecondaryFilterClick = (name: string) => () =>
-		MapStore.activeSecondary.set(name);
+		MapStore.activeSecondary.set(name)
 
 	public render() {
 		return (

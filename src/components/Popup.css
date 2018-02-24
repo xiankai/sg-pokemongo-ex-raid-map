@@ -1,0 +1,8 @@
+.leaflet-popup-content ul {
+	padding: 0;
+}
+
+.leaflet-popup-content li {
+	display: flex;
+	justify-content: space-around;
+}
