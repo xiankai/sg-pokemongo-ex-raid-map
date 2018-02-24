@@ -111,19 +111,23 @@ class MapStore {
 				)
 			);
 
-			const dates = [].concat(
-				...this.gyms.map(feature => feature.properties.dates)
-			);
+			const unixDates = []
+				.concat(...this.gyms.map(feature => feature.properties.dates))
+				.map(date =>
+					moment(date, rawDateFormat, true)
+						.set('hour', 0)
+						.set('minute', 0)
+						.set('second', 0)
+						.set('millisecond', 0)
+						.unix()
+				);
 
-			this.dates.push(
-				...dates
-					.filter((item, pos) => item && dates.indexOf(item) === pos)
-					.sort(
-						(a, b) =>
-							moment(b, rawDateFormat, true).unix() -
-							moment(a, rawDateFormat, true).unix()
-					)
-			);
+			const momentDates = unixDates
+				.filter((item, pos) => item && unixDates.indexOf(item) === pos)
+				.sort((a, b) => b - a)
+				.map(unix => moment.unix(unix));
+
+			this.dates.push(...momentDates);
 
 			// Run once. Have to do this for "Potential"
 			this.addToMap(this.activeFilter.get(), this.activeSecondary.get());
@@ -187,7 +191,7 @@ class MapStore {
 		});
 	}
 
-	public addToMap = (key?: string, value?: string) =>
+	public addToMap = (key?: string, value?: string | moment.Moment) =>
 		transaction(() => {
 			this.totalCount.set(0);
 			const filter: FilterFunction = (feature: IGeoJSONFeature) => {
@@ -223,6 +227,23 @@ class MapStore {
 							return false;
 						}
 						default:
+							if (key === 'dates') {
+								return (
+									feature.properties[key]
+										.map(date =>
+											moment(
+												date,
+												rawDateFormat,
+												true
+											).format('YYYY-MM-DD')
+										)
+										.indexOf(
+											(value as moment.Moment).format(
+												'YYYY-MM-DD'
+											)
+										) > -1
+								);
+							}
 							return feature.properties[key].indexOf(value) > -1;
 					}
 				};
@@ -286,7 +307,7 @@ class MapStore {
 							(process.env.REACT_APP_DATES_TO_EXCLUDE || '')
 								.split(',')
 								.filter(Boolean)
-								.indexOf(date) < 0
+								.indexOf(date.format(displayDateFormat)) < 0
 					);
 
 					if (dates.length >= Math.floor(eligibleDates.length / 2)) {
@@ -316,7 +337,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		})
+		});
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
@@ -387,7 +408,7 @@ class MapStore {
 			<br/>
 			${extraLink}
 		`;
-	}
+	};
 }
 
 const singleton = new MapStore();

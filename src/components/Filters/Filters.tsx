@@ -1,15 +1,14 @@
 import * as classnames from 'classnames';
 import { observer } from 'mobx-react';
-import * as moment from 'moment';
 import * as React from 'react';
 import MapStore from '../../model/MapStore';
 import './Filters.css';
 
 class Filters extends React.Component<{}, {}> {
 	public handleFilterClick = (name: string) => () =>
-		MapStore.active.set(name)
+		MapStore.active.set(name);
 	public handleSecondaryFilterClick = (name: string) => () =>
-		MapStore.activeSecondary.set(name)
+		MapStore.activeSecondary.set(name);
 
 	public render() {
 		return (
@@ -48,11 +47,7 @@ class Filters extends React.Component<{}, {}> {
 							{MapStore.activeFilter.get() !== 'dates' ||
 							['All', 'Potential'].indexOf(secondaryFilter) > -1
 								? secondaryFilter
-								: moment(
-										secondaryFilter,
-										process.env.REACT_APP_RAW_DATE_FORMAT,
-										true
-									).format(
+								: secondaryFilter.format(
 										process.env
 											.REACT_APP_DISPLAY_DATE_FORMAT
 									)}
