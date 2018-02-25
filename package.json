@@ -20,7 +20,7 @@
 	},
 	"scripts": {
 		"predeploy": "yarn build",
-		"deploy": "gh-pages -d build",
+		"deploy": "node deploy.js",
 		"start": "react-scripts-ts start",
 		"build": "react-scripts-ts build",
 		"test": "react-scripts-ts test --env=jsdom",
@@ -38,5 +38,5 @@
 		"tslint-config-prettier": "^1.7.0",
 		"typescript": "^2.7.1"
 	},
-	"homepage": "https://xiankai.github.io/sg-pokemongo-ex-raid-map/"
+	"homepage": "."
 }
