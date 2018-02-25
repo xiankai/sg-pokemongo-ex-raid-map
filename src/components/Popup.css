@@ -4,5 +4,5 @@
 
 .leaflet-popup-content li {
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-between;
 }

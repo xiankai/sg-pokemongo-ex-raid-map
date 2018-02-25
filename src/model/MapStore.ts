@@ -337,7 +337,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		});
+		})
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
@@ -408,7 +408,7 @@ class MapStore {
 			<br/>
 			${extraLink}
 		`;
-	};
+	}
 }
 
 const singleton = new MapStore();
