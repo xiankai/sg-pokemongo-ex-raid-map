@@ -206,15 +206,15 @@ class MapStore {
 						case 'Potential': {
 							const { terrains, dates } = feature.properties;
 
-							const latestDate = moment
-								.max(
-									...dates.map(date =>
-										moment(date, rawDateFormat, true)
-									)
+							const latestDate = moment.max(
+								...dates.map(date =>
+									moment(date, rawDateFormat, true)
 								)
-								.format(rawDateFormat);
+							);
 
-							if (latestDate === this.defaultDate.get()) {
+							if (
+								latestDate.isSame(this.defaultDate.get(), 'day')
+							) {
 								return false;
 							}
 
