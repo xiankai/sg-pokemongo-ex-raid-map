@@ -19,7 +19,6 @@
 		"react-scripts-ts": "2.13.0"
 	},
 	"scripts": {
-		"predeploy": "yarn build",
 		"deploy": "node deploy.js",
 		"start": "react-scripts-ts start",
 		"build": "react-scripts-ts build",
