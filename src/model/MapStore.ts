@@ -194,6 +194,7 @@ class MapStore {
 	public addToMap = (key?: string, value?: string | moment.Moment) =>
 		transaction(() => {
 			this.totalCount.set(0);
+			const today = moment();
 			const filter: FilterFunction = (feature: IGeoJSONFeature) => {
 				const flagFn = () => {
 					if (!key || key === 'gyms') {
@@ -206,15 +207,13 @@ class MapStore {
 						case 'Potential': {
 							const { terrains, dates } = feature.properties;
 
-							const latestDate = moment.max(
-								...dates.map(date =>
-									moment(date, rawDateFormat, true)
-								)
-							);
+							const scheduledForFuture = dates
+								.map(date => moment(date, rawDateFormat, true))
+								.filter(dateMoment =>
+									dateMoment.isAfter(today)
+								);
 
-							if (
-								latestDate.isSame(this.defaultDate.get(), 'day')
-							) {
+							if (scheduledForFuture.length > 0) {
 								return false;
 							}
 
