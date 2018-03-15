@@ -4,6 +4,9 @@ const id = process.argv[2] || 'singapore';
 execSync('rm -f .env.production .env.local.production');
 execSync(`ln -s ${id}.env .env.production`);
 execSync(
+	'grep -e"CUSTOM_DOMAIN" .env.production | cut -f2 -d"=" > public/CNAME'
+);
+execSync(
 	`echo "REACT_APP_VERSION=${new Date().getDate()} ${new Date()
 		.toString()
 		.slice(4, 7)}" > .env.local.production`
@@ -24,7 +27,7 @@ ghpages.publish(
 		if (err) {
 			console.error(err);
 		} else {
-			execSync('rm .env.production .env.local.production');
+			execSync('rm .env.production .env.local.production public/CNAME');
 			console.log(`Successfully deployed for ${id}`);
 		}
 	}
