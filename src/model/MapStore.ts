@@ -228,21 +228,23 @@ class MapStore {
 						}
 						default:
 							if (key === 'dates') {
-								return (
-									feature.properties[key]
-										.map(date =>
-											moment(
-												date,
-												rawDateFormat,
-												true
-											).format('YYYY-MM-DD')
-										)
-										.indexOf(
-											(value as moment.Moment).format(
-												'YYYY-MM-DD'
+								if (moment.isMoment(value)) {
+									return (
+										feature.properties[key]
+											.map(date =>
+												moment(
+													date,
+													rawDateFormat,
+													true
+												).format('YYYY-MM-DD')
 											)
-										) > -1
-								);
+											.indexOf(
+												value.format('YYYY-MM-DD')
+											) > -1
+									);
+								} else {
+									return false;
+								}
 							}
 							return feature.properties[key].indexOf(value) > -1;
 					}
@@ -337,7 +339,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		})
+		});
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
@@ -408,7 +410,7 @@ class MapStore {
 			<br/>
 			${extraLink}
 		`;
-	}
+	};
 }
 
 const singleton = new MapStore();
