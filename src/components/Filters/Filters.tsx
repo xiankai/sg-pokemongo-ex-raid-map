@@ -50,7 +50,7 @@ class Filters extends React.Component<{}, {}> {
 								: secondaryFilter.format(
 										process.env
 											.REACT_APP_DISPLAY_DATE_FORMAT
-									)}
+								  )}
 						</div>
 					))}
 				</div>

@@ -19,6 +19,7 @@ import {
 	IGeoJSONFeature,
 	LoopFunction,
 } from '../@types/geojson';
+import OverlayStore from './OverlayStore';
 import S2Store from './S2Store';
 
 export interface IS2CellCount {
@@ -37,10 +38,6 @@ class MapStore {
 	public layer: LayerGroup;
 	public defaultLayer: TileLayer = tileLayer('');
 	public markers: LayerGroup;
-	public s2Levels: number[] = (process.env.REACT_APP_S2_LEVELS || '')
-		.split(',')
-		.filter(Boolean)
-		.map(Number);
 	public s2Stores: S2Store[] = [];
 
 	public terrains = observable([]);
@@ -134,10 +131,19 @@ class MapStore {
 		};
 
 		init().then(() => {
-			if (this.s2Levels.length > 0) {
+			const s2Levels = S2Store.parseS2Config();
+			const overlays = OverlayStore.parseOverlayConfig();
+			const overlayLayers: any = overlays.reduce((obj, config) => {
+				const overlayStore = new OverlayStore(config);
+
+				obj[config.label] = overlayStore.layer;
+
+				return obj;
+			}, {});
+			if (s2Levels.length > 0) {
 				control
 					.layers(
-						this.s2Levels.reduce(
+						s2Levels.reduce(
 							(obj, cellLevel) => {
 								const s2Store = new S2Store({ cellLevel });
 
@@ -151,7 +157,8 @@ class MapStore {
 							{
 								None: this.defaultLayer,
 							}
-						)
+						),
+						overlayLayers
 					)
 					.addTo(this.map);
 			}
@@ -338,7 +345,7 @@ class MapStore {
 			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
 				autoPanPaddingTopLeft: [100, 100],
 			});
-		});
+		})
 
 	public renderPopup = (layer: any) => {
 		const feature = layer.feature;
@@ -409,7 +416,7 @@ class MapStore {
 			<br/>
 			${extraLink}
 		`;
-	};
+	}
 }
 
 const singleton = new MapStore();

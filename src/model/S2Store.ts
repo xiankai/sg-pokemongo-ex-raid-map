@@ -18,6 +18,11 @@ interface IS2LatLng {
 }
 
 class S2Store {
+	public static parseS2Config = () =>
+		(process.env.REACT_APP_S2_LEVELS || '')
+			.split(',')
+			.filter(Boolean)
+			.map(Number)
 	public url: string = '';
 	public valid: boolean = true;
 	public cellLevel: number;
@@ -91,7 +96,7 @@ class S2Store {
 							html: s2CellCount[reference]
 								? `${reference} <span class="s2-label s2-count">(${
 										s2CellCount[reference].count
-									})</span>`
+								  })</span>`
 								: '',
 						}),
 					}
@@ -133,7 +138,7 @@ class S2Store {
 		// 	)
 		// );
 		// this.layer.addLayer(totals);
-	};
+	}
 }
 
 export default S2Store;
