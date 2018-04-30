@@ -20,6 +20,7 @@ import {
 	LoopFunction,
 } from '../@types/geojson';
 import OverlayStore from './OverlayStore';
+import { renderPopup } from './Popup';
 import S2Store from './S2Store';
 
 export interface IS2CellCount {
@@ -31,7 +32,6 @@ export interface IS2CellCount {
 
 const rawDateFormat = process.env.REACT_APP_RAW_DATE_FORMAT;
 const displayDateFormat = process.env.REACT_APP_DISPLAY_DATE_FORMAT;
-const displayTimeFormat = process.env.REACT_APP_DISPLAY_TIME_FORMAT;
 
 class MapStore {
 	public map: Map;
@@ -128,9 +128,7 @@ class MapStore {
 
 			// Run once. Have to do this for "Potential"
 			this.addToMap(this.activeFilter.get(), this.activeSecondary.get());
-		};
 
-		init().then(() => {
 			const s2Levels = S2Store.parseS2Config();
 			const overlays = OverlayStore.parseOverlayConfig();
 			const overlayLayers: any = overlays.reduce((obj, config) => {
@@ -165,8 +163,9 @@ class MapStore {
 
 			this.map.addLayer(this.defaultLayer);
 			this.map.addLayer(this.markers);
-		});
+		};
 
+		init();
 		reaction(
 			() => this.activeFilter.get(),
 			key => {
@@ -202,6 +201,7 @@ class MapStore {
 		transaction(() => {
 			this.totalCount.set(0);
 			const today = moment();
+			const s2 = this.activeS2.get();
 			const filter: FilterFunction = (feature: IGeoJSONFeature) => {
 				const flagFn = () => {
 					if (!key || key === 'gyms') {
@@ -265,10 +265,9 @@ class MapStore {
 			const s2CellCount: IS2CellCount = {};
 			let onEachFeature: LoopFunction = () => {};
 
-			if (this.activeS2.get()) {
+			if (s2) {
 				onEachFeature = (feature: IGeoJSONFeature) => {
-					const s2CellLabel =
-						feature.properties[this.activeS2.get().cellReference];
+					const s2CellLabel = feature.properties[s2.cellReference];
 					const s2Cell = s2CellCount[s2CellLabel];
 					const total = feature.properties.dates.length;
 					if (s2Cell) {
@@ -337,86 +336,17 @@ class MapStore {
 				},
 			});
 
-			if (this.activeS2.get()) {
-				this.activeS2.get().overlayS2Labels(s2CellCount);
+			if (s2) {
+				s2.overlayS2Labels(s2CellCount);
 			}
 
 			this.markers.clearLayers();
-			this.markers.addLayer(this.layer).bindPopup(this.renderPopup, {
-				autoPanPaddingTopLeft: [100, 100],
-			});
-		})
-
-	public renderPopup = (layer: any) => {
-		const feature = layer.feature;
-		const dates = feature.properties.dates;
-		let lngLat = feature.geometry.coordinates;
-		lngLat = lngLat.map((x: number) => Math.round(x * 10e6) / 10e6);
-
-		let exraidHTML = '';
-		if (dates && dates.length > 0) {
-			dates
-				.sort(
-					(a: string, b: string) =>
-						moment(b, rawDateFormat, true).unix() -
-						moment(a, rawDateFormat, true).unix()
-				)
-				.forEach((date: string) => {
-					const datetime = moment(date, rawDateFormat, true);
-					const hasTime = displayTimeFormat && datetime.hour() > 0;
-					exraidHTML += `<li>
-						<span>${datetime.format(displayDateFormat)}</span>
-						<span style="width: 20px;"></span>
-						<span>${
-							hasTime
-								? ` ${datetime.format(displayTimeFormat)} - 
-							${datetime.add(45, 'minutes').format(displayTimeFormat)}`
-								: ''
-						}</span>
-						</li>`;
+			this.markers
+				.addLayer(this.layer)
+				.bindPopup(renderPopup({ cellLevel: s2 && s2.cellLevel }), {
+					autoPanPaddingTopLeft: [100, 100],
 				});
-			exraidHTML = '<div>EX-raid(s):<ul>' + exraidHTML;
-			exraidHTML += '</ul></div>';
-		} else {
-			exraidHTML += '<div>No EX-raid yet</div>';
-		}
-
-		if (this.activeS2.get()) {
-			const cellLevel = this.activeS2.get().cellLevel;
-			exraidHTML += `<div>S2 L${cellLevel} Cell: ${
-				feature.properties[`S2L${cellLevel}`]
-			}</div>`;
-		}
-
-		const label = process.env.REACT_APP_MAP_LINK_LABEL;
-		const url = (process.env.REACT_APP_MAP_LINK_URL || '')
-			.replace('{lng}', lngLat[1])
-			.replace('{lat}', lngLat[0]);
-
-		let extraLink = '';
-		if (label && url) {
-			extraLink = `
-				<div>
-					<a target="_blank" href="${url}">${label}</a>
-				</div>
-			`;
-		}
-
-		return `
-			<strong>
-				${feature.properties.name}
-			</strong>
-			${exraidHTML}
-			<br/>
-			<div>
-				<a target="_blank" href="
-				https://www.google.com/maps/search/?api=1&query=${lngLat[1]},${lngLat[0]}
-				">Google Maps</a>
-			</div>
-			<br/>
-			${extraLink}
-		`;
-	}
+		});
 }
 
 const singleton = new MapStore();
