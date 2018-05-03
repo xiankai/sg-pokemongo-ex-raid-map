@@ -13,7 +13,7 @@ import * as moment from 'moment';
 import { IGeoJSON, IGeoJSONFeature, LoopFunction } from '../@types/geojson';
 import { renderMarker, shouldShowMarker } from './Marker';
 import OverlayStore from './OverlayStore';
-import { renderPopup } from './Popup';
+import { mergeLegacyGyms, renderPopup } from './Popup';
 import S2Store from './S2Store';
 
 export interface IS2CellCount {
@@ -88,7 +88,7 @@ class MapStore {
 
 			const data: IGeoJSON = await response.json();
 
-			this.gyms = data.features;
+			this.gyms = mergeLegacyGyms(data.features);
 
 			const terrains = [].concat(
 				...this.gyms.map(feature => feature.properties.terrains)
