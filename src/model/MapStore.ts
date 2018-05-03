@@ -234,6 +234,8 @@ class MapStore {
 				s2.overlayS2Labels(s2CellCount);
 			}
 
+			this.totalCount.set(this.layer.getLayers().length);
+
 			this.markers.clearLayers();
 			this.markers
 				.addLayer(this.layer)
