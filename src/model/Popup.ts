@@ -10,7 +10,6 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 	layer: Marker
 ): Content => {
 	let feature = layer.feature;
-	const dates = feature.properties.dates;
 	let lngLat = feature.geometry.coordinates;
 	lngLat = lngLat.map((x: number) => Math.round(x * 10e6) / 10e6);
 
@@ -30,7 +29,7 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 				${feature.properties.name}
 			</strong>
 		`;
-		exraidHTML += renderDates(dates);
+		exraidHTML += renderDates(feature.properties.dates);
 		exraidHTML += '<br />';
 		feature = feature.properties.inherit;
 	} while (feature);
