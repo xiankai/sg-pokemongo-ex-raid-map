@@ -1,7 +1,10 @@
+import { Feature } from 'geojson';
 import { GeoJSONOptions, icon, marker } from 'leaflet';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import * as moment from 'moment';
+import { IGeoJSONFeature } from '../@types/geojson';
 
+const rawDateFormat = process.env.REACT_APP_RAW_DATE_FORMAT;
 const displayDateFormat = process.env.REACT_APP_DISPLAY_DATE_FORMAT;
 
 export const renderMarker = (
@@ -45,4 +48,67 @@ export const renderMarker = (
 	}
 
 	return marker(latLng, markerOptions);
+};
+
+export const shouldShowMarker = ({
+	key,
+	value,
+	park,
+}: {
+	key?: string;
+	value?: string | moment.Moment;
+	park: string;
+}) => (
+	feature: Feature<IGeoJSONFeature['geometry'], IGeoJSONFeature['properties']>
+) => {
+	const today = moment();
+	const flagFn = () => {
+		if (!key || key === 'gyms') {
+			return true;
+		}
+
+		switch (value) {
+			case 'All':
+				return feature.properties[key].length > 0;
+			case 'Potential': {
+				const { terrains, dates } = feature.properties;
+
+				const scheduledForFuture = dates
+					.map(date => moment(date, rawDateFormat, true))
+					.filter(dateMoment => dateMoment.isAfter(today));
+
+				if (scheduledForFuture.length > 0) {
+					return false;
+				}
+
+				if (terrains.indexOf(park) > -1) {
+					return true;
+				}
+
+				return false;
+			}
+			default:
+				if (key === 'dates') {
+					if (moment.isMoment(value)) {
+						return (
+							feature.properties[key]
+								.map(date =>
+									moment(date, rawDateFormat, true).format(
+										'YYYY-MM-DD'
+									)
+								)
+								.indexOf(value.format('YYYY-MM-DD')) > -1
+						);
+					} else {
+						return false;
+					}
+				}
+				return feature.properties[key].indexOf(value) > -1;
+		}
+	};
+
+	if (flagFn()) {
+		return true;
+	}
+	return false;
 };

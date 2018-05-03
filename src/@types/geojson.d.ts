@@ -7,7 +7,7 @@ export type Coordinates = [Latitude, Longitude];
 export interface IGeoJSONFeature {
 	type: string;
 	geometry: {
-		type: string;
+		type: 'Point';
 		coordinates: [number, number];
 	};
 	properties: {

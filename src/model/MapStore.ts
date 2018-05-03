@@ -10,13 +10,8 @@ import {
 import 'leaflet.markercluster';
 import { computed, observable, reaction, transaction } from 'mobx';
 import * as moment from 'moment';
-import {
-	FilterFunction,
-	IGeoJSON,
-	IGeoJSONFeature,
-	LoopFunction,
-} from '../@types/geojson';
-import { renderMarker } from './Marker';
+import { IGeoJSON, IGeoJSONFeature, LoopFunction } from '../@types/geojson';
+import { renderMarker, shouldShowMarker } from './Marker';
 import OverlayStore from './OverlayStore';
 import { renderPopup } from './Popup';
 import S2Store from './S2Store';
@@ -197,68 +192,7 @@ class MapStore {
 	public addToMap = (key?: string, value?: string | moment.Moment) =>
 		transaction(() => {
 			this.totalCount.set(0);
-			const today = moment();
 			const s2 = this.activeS2.get();
-			const filter: FilterFunction = (feature: IGeoJSONFeature) => {
-				const flagFn = () => {
-					if (!key || key === 'gyms') {
-						return true;
-					}
-
-					switch (value) {
-						case 'All':
-							return feature.properties[key].length > 0;
-						case 'Potential': {
-							const { terrains, dates } = feature.properties;
-
-							const scheduledForFuture = dates
-								.map(date => moment(date, rawDateFormat, true))
-								.filter(dateMoment =>
-									dateMoment.isAfter(today)
-								);
-
-							if (scheduledForFuture.length > 0) {
-								return false;
-							}
-
-							if (
-								terrains.indexOf(this.defaultTerrain.get()) > -1
-							) {
-								return true;
-							}
-
-							return false;
-						}
-						default:
-							if (key === 'dates') {
-								if (moment.isMoment(value)) {
-									return (
-										feature.properties[key]
-											.map(date =>
-												moment(
-													date,
-													rawDateFormat,
-													true
-												).format('YYYY-MM-DD')
-											)
-											.indexOf(
-												value.format('YYYY-MM-DD')
-											) > -1
-									);
-								} else {
-									return false;
-								}
-							}
-							return feature.properties[key].indexOf(value) > -1;
-					}
-				};
-
-				if (flagFn()) {
-					this.totalCount.set(this.totalCount.get() + 1);
-					return true;
-				}
-				return false;
-			};
 			const s2CellCount: IS2CellCount = {};
 			let onEachFeature: LoopFunction = () => {};
 
@@ -287,7 +221,11 @@ class MapStore {
 			};
 
 			this.layer = geoJSON(FeatureCollection, {
-				filter,
+				filter: shouldShowMarker({
+					key,
+					value,
+					park: this.defaultTerrain.get(),
+				}),
 				onEachFeature,
 				pointToLayer: renderMarker(this.dates),
 			});
