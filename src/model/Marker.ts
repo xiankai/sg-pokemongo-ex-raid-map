@@ -44,6 +44,8 @@ export const renderMarker = (
 			iconUrl: `${process.env.PUBLIC_URL}/markers/${customMarker}.png`,
 			shadowUrl,
 			popupAnchor: [0, -32],
+			className:
+				geoJsonPoint.properties.inherit === null ? 'obsolete' : '',
 		});
 	}
 

@@ -11,6 +11,7 @@ import MapStore from '../model/MapStore';
 import Controls from './Controls';
 import Filters from './Filters/Filters';
 import './Map.css';
+import './Marker.css';
 import './Popup.css';
 import './S2.css';
 

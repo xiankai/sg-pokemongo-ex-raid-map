@@ -26,7 +26,8 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 	do {
 		exraidHTML += `
 			<strong>
-				${feature.properties.name}
+				${feature.properties.inherit === null ? '(Removed) ' : ''}
+				${feature.properties.name} 
 			</strong>
 		`;
 		exraidHTML += renderDates(feature.properties.dates);
@@ -65,6 +66,12 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 
 export const mergeLegacyGyms = (gyms: IGeoJSONFeature[]): IGeoJSONFeature[] => {
 	const mapFn = (currentGym: IGeoJSONFeature) => {
+		if (currentGym.properties.supercededBy === 'Obsolete') {
+			delete currentGym.properties.supercededBy;
+			currentGym.properties.inherit = null;
+			return currentGym;
+		}
+
 		const superceding = gyms.find(
 			gym => currentGym.properties.name === gym.properties.supercededBy
 		);
@@ -78,7 +85,13 @@ export const mergeLegacyGyms = (gyms: IGeoJSONFeature[]): IGeoJSONFeature[] => {
 		return currentGym;
 	};
 
-	return gyms.filter(v => !v.properties.supercededBy).map(mapFn);
+	return gyms
+		.filter(
+			v =>
+				!v.properties.supercededBy ||
+				v.properties.supercededBy === 'Obsolete'
+		)
+		.map(mapFn);
 };
 
 const renderDates = (dates: string[]): string => {

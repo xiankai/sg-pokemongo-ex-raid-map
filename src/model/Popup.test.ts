@@ -50,4 +50,20 @@ describe('mergeLegacyGyms', () => {
 	it('double merge', () => {
 		expect(mergeLegacyGyms(threeGyms)).toEqual(oneGymC);
 	});
+
+	const obsoleteGym = [
+		generateDummyGym('d', {
+			supercededBy: 'Obsolete',
+		}),
+	];
+
+	const oneGymD = [
+		generateDummyGym('d', {
+			inherit: null,
+		}),
+	];
+
+	it('obsolete gym', () => {
+		expect(mergeLegacyGyms(obsoleteGym)).toEqual(oneGymD);
+	});
 });
