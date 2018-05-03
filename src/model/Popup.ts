@@ -23,9 +23,11 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 		cellHTML += `<br />`;
 	}
 
+	let inherit = false;
 	do {
 		exraidHTML += `
 			<strong>
+				${inherit ? '(Previously was) ' : ''}
 				${feature.properties.inherit === null ? '(Removed) ' : ''}
 				${feature.properties.name} 
 			</strong>
@@ -33,6 +35,7 @@ export const renderPopup = ({ cellLevel }: { cellLevel: number }) => (
 		exraidHTML += renderDates(feature.properties.dates);
 		exraidHTML += '<br />';
 		feature = feature.properties.inherit;
+		inherit = true;
 	} while (feature);
 
 	const label = process.env.REACT_APP_MAP_LINK_LABEL;
